@@ -74,7 +74,6 @@
 
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors-slow">
 
-    <!-- Navbar -->
     <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors-slow">
         <div class="max-w-6xl mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
@@ -87,7 +86,6 @@
                         Accueil
                     </a>
                     
-                    <!-- Icône Panier -->
                     <button id="cartButton" class="relative text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition">
                         <span class="material-symbols-outlined text-3xl">shopping_cart</span>
                         <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">
@@ -104,7 +102,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="relative gradient-animation text-white py-12 transition-colors-slow">
         <div class="max-w-6xl mx-auto px-4 text-center">
             <h1 class="text-4xl md:text-5xl font-title font-bold mb-4">Notre Catalogue</h1>
@@ -113,7 +110,6 @@
             </p>
         </div>
 
-        <!-- Vague décorative -->
         <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180">
             <svg class="relative block w-[200%] h-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                 <path d="M0,0V46.29c47.79,22,103.79,29.05,158,17.58C230.91,50.53,284,7.62,339.65,1.43c71.73-8.4,136.76,39.3,207.7,35.36,62.9-3.52,113.45-45.19,172.29-56.69,59.63-11.7,117.24,17.47,173.62,35.21,43.84,13.63,87.55,16.78,131.45,5.43V0Z" opacity=".1" fill="#ffffff"></path>
@@ -123,19 +119,16 @@
         </div>
     </section>
 
-    <!-- Contenu Principal -->
     <main class="max-w-6xl mx-auto px-4 py-8">
 
-        <!-- Barre de recherche et filtres -->
         <section class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 transition-colors-slow">
             
-            <!-- Barre de recherche -->
             <div class="mb-6">
                 <div class="relative">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        placeholder="🔍 Rechercher par nom, CIP ou laboratoire..." 
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="🔍 Rechercher par nom, CIP ou laboratoire..."
                         class="w-full px-4 py-4 pl-12 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-white transition text-lg"
                     >
                     <span class="material-symbols-outlined absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-2xl">
@@ -143,14 +136,12 @@
                     </span>
                 </div>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    💡 La recherche s'effectue automatiquement pendant que vous tapez
+                    💡 La recherche s'effectue automatiquement pendant que vous tapez (minimum 2 caractères)
                 </p>
             </div>
 
-            <!-- Filtres -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 
-                <!-- Filtre Laboratoire -->
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                         <span class="material-symbols-outlined text-sm align-middle">science</span>
@@ -158,10 +149,9 @@
                     </label>
                     <select id="labFilter" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
                         <option value="">Tous les laboratoires</option>
-                    </select>
+                        </select>
                 </div>
 
-                <!-- Filtre Catégorie -->
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                         <span class="material-symbols-outlined text-sm align-middle">category</span>
@@ -169,15 +159,14 @@
                     </label>
                     <select id="categoryFilter" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
                         <option value="">Toutes les catégories</option>
-                    </select>
+                        </select>
                 </div>
 
-                <!-- Case à cocher En Stock -->
                 <div class="flex items-center">
                     <label class="flex items-center space-x-2 cursor-pointer mt-6">
-                        <input 
-                            type="checkbox" 
-                            id="stockFilter" 
+                        <input
+                            type="checkbox"
+                            id="stockFilter"
                             class="w-5 h-5 text-teal-600 rounded focus:ring-2 focus:ring-teal-500"
                         >
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -186,10 +175,9 @@
                     </label>
                 </div>
 
-                <!-- Bouton Réinitialiser -->
                 <div class="flex items-end">
-                    <button 
-                        id="resetFiltersBtn" 
+                    <button
+                        id="resetFiltersBtn"
                         class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-3 rounded-lg transition flex items-center justify-center gap-2 font-medium"
                     >
                         <span class="material-symbols-outlined">refresh</span>
@@ -198,7 +186,6 @@
                 </div>
             </div>
 
-            <!-- Radio Buttons Affichage Spécial -->
             <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <label class="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
                     <span class="material-symbols-outlined text-sm align-middle">filter_list</span>
@@ -206,38 +193,38 @@
                 </label>
                 <div class="flex flex-wrap gap-4">
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input 
-                            type="radio" 
-                            name="displayMode" 
-                            value="tous" 
-                            checked 
+                        <input
+                            type="radio"
+                            name="displayMode"
+                            value="tous"
+                            checked
                             class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500"
                         >
                         <span class="text-sm text-gray-700 dark:text-gray-300">Tous les produits</span>
                     </label>
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input 
-                            type="radio" 
-                            name="displayMode" 
-                            value="misEnAvant" 
+                        <input
+                            type="radio"
+                            name="displayMode"
+                            value="misEnAvant"
                             class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500"
                         >
                         <span class="text-sm text-gray-700 dark:text-gray-300">⭐ Les + consultés</span>
                     </label>
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input 
-                            type="radio" 
-                            name="displayMode" 
-                            value="promotions" 
+                        <input
+                            type="radio"
+                            name="displayMode"
+                            value="promotions"
                             class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500"
                         >
                         <span class="text-sm text-gray-700 dark:text-gray-300">🔥 Promotions</span>
                     </label>
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input 
-                            type="radio" 
-                            name="displayMode" 
-                            value="petitsPrix" 
+                        <input
+                            type="radio"
+                            name="displayMode"
+                            value="petitsPrix"
                             class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500"
                         >
                         <span class="text-sm text-gray-700 dark:text-gray-300">💰 Petits prix</span>
@@ -246,31 +233,25 @@
             </div>
         </section>
 
-        <!-- Informations et résultats -->
         <div class="flex justify-between items-center mb-6">
             <p class="text-gray-600 dark:text-gray-400">
-                <span id="resultsCount" class="font-bold text-teal-600 dark:text-teal-400">0</span> 
+                <span id="resultsCount" class="font-bold text-teal-600 dark:text-teal-400">0</span>
                 produit(s) trouvé(s)
             </p>
             <p class="text-sm text-gray-500 dark:text-gray-500" id="updateTime">Chargement...</p>
         </div>
 
-        <!-- Grille de produits -->
         <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Les produits seront chargés ici -->
-        </div>
+            </div>
 
-        <!-- Loading -->
         <div id="loadingIndicator" class="text-center py-12 hidden">
             <div class="inline-block w-12 h-12 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin"></div>
             <p class="mt-4 text-gray-600 dark:text-gray-400">Chargement des produits...</p>
         </div>
     </main>
 
-    <!-- Overlay Panier -->
     <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
 
-    <!-- Drawer Panier (Gauche) -->
     <div id="cartDrawer" class="fixed top-0 left-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl transform -translate-x-full transition-transform duration-300 z-50 flex flex-col">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <h2 class="text-2xl font-title font-bold text-gray-800 dark:text-white">🛒 Mon Panier</h2>
@@ -292,10 +273,8 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="assets/js/config.js"></script>
     <script src="assets/js/cache-manager.js"></script>
     <script src="assets/js/cart-v2.js"></script>
-    <script src="assets/js/catalogue.js"></script>
-</body>
+    <script src="assets/js/catalogue.js"></script> </body>
 </html>

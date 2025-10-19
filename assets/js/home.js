@@ -1,6 +1,6 @@
 // ==========================================
 // Gestionnaire des Produits - Page d'Accueil
-// VERSION OPTIMISÉE avec design catalogue
+// VERSION OPTIMISÉE avec endpoint dédié + STYLES CATALOGUE
 // ==========================================
 
 class HomeProductsManager {
@@ -29,37 +29,40 @@ class HomeProductsManager {
     }
 
     /**
-     * Charger les produits mis en avant (optimisé)
+     * 🚀 OPTIMISÉ : Charger les produits via l'endpoint dédié /home
+     * - Stock > 0 uniquement
+     * - Petits Prix + Promos
+     * - Max 15 produits
+     * - Ultra-rapide (8-15 Ko au lieu de 800 Ko)
      */
     async loadFeaturedProducts() {
         try {
-            console.log('🔥 Chargement des produits mis en avant...');
+            console.log('🔥 Chargement ultra-rapide des produits (endpoint optimisé)...');
             this.showLoading();
             
             const startTime = performance.now();
             
-            // Utiliser l'endpoint optimisé getHomeProducts si disponible
-            let response;
-            if (typeof apiService.getHomeProducts === 'function') {
-                response = await apiService.getHomeProducts();
-            } else {
-                // Fallback sur getProducts avec filtres
-                response = await apiService.getProducts({ featured: true, limit: 15 });
-            }
+            // NOUVEAU : endpoint ultra-rapide dédié à la page d'accueil
+            const response = await apiService.getHomeProducts();
             
             const endTime = performance.now();
             const totalTime = Math.round(endTime - startTime);
             
-            console.log('✅ Réponse API:', response);
+            console.log('✅ Réponse API Home:', response);
             console.log(`⚡ Temps de chargement: ${totalTime}ms`);
             
             const products = response.data.products || [];
             
-            console.log(`📦 ${products.length} produits reçus`);
+            console.log(`📦 ${products.length} produits reçus (Petits Prix + Promos en stock)`);
             
             if (products.length > 0) {
                 this.renderProducts(products);
                 this.hideStatus();
+                
+                // Afficher le temps de chargement en dev
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    console.log(`🎯 Performance: ${totalTime}ms pour ${products.length} produits`);
+                }
             } else {
                 this.showEmptyState();
             }
@@ -90,7 +93,7 @@ class HomeProductsManager {
         
         reserveButtons.forEach(btn => {
             btn.addEventListener('click', async () => {
-                console.log('🛒 Clic sur Réserver');
+                console.log('🛒 Clic sur Réserver (home)');
                 
                 const product = {
                     id: btn.dataset.id,
@@ -124,7 +127,7 @@ class HomeProductsManager {
                 // Ajouter au panier
                 try {
                     window.cartManager.addItem(product);
-                    console.log('✅ Produit ajouté au panier');
+                    console.log('✅ Produit ajouté au panier depuis home');
                     
                     // Feedback visuel
                     const originalHTML = btn.innerHTML;
@@ -173,7 +176,7 @@ class HomeProductsManager {
     }
 
     /**
-     * Créer une carte produit (STYLE CATALOGUE COMPACT)
+     * Créer une carte produit (STYLE CATALOGUE)
      */
     createProductCard(product) {
         // Labels de promotion
@@ -192,7 +195,7 @@ class HomeProductsManager {
         
         // Badge ordonnance
         if (product.tableau) {
-            badgesHtml += `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 dark:bg-rose-900 dark:text-rose-300">📋 Ordonnance</span>`;
+            badgesHtml += `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">📋 Ordonnance</span>`;
         }
         
         // Prix (LOGIQUE DU CATALOGUE)
@@ -208,19 +211,16 @@ class HomeProductsManager {
         }
         
         // Déterminer le prix à afficher
-        const prix = product.prix_vendu || product.prix || product.prix_final;
-        const prix_promo = product.promo_si_1 || product.prix_promo;
-        
         if (promoNorm === 'petits prix') {
             // Petits Prix : afficher prix_promo ou prix avec style promo
-            const val = typeof prix_promo === 'number' ? prix_promo : prix;
+            const val = typeof product.prix_promo === 'number' ? product.prix_promo : product.prix;
             priceHTML = `<div class="flex items-baseline gap-2"><span class="price-promo">${this.formatPrice(val)}</span>${lotHTML}</div>`;
-        } else if (typeof prix_promo === 'number' && Number.isFinite(prix_promo)) {
+        } else if (typeof product.prix_promo === 'number' && Number.isFinite(product.prix_promo)) {
             // Promo classique : ancien prix barré + nouveau prix
-            priceHTML = `<div class="flex items-baseline gap-2"><span class="price-old">${this.formatPrice(prix)}</span><span class="price-promo">${this.formatPrice(prix_promo)}</span>${lotHTML}</div>`;
+            priceHTML = `<div class="flex items-baseline gap-2"><span class="price-old">${this.formatPrice(product.prix)}</span><span class="price-promo">${this.formatPrice(product.prix_promo)}</span>${lotHTML}</div>`;
         } else {
             // Prix normal
-            priceHTML = `<div class="flex items-baseline gap-2"><span class="text-xl font-bold text-gray-800 dark:text-white">${this.formatPrice(prix)}</span>${lotHTML}</div>`;
+            priceHTML = `<div class="flex items-baseline gap-2"><span class="text-xl font-bold text-gray-800 dark:text-white">${this.formatPrice(product.prix)}</span>${lotHTML}</div>`;
         }
         
         // Statut de disponibilité
@@ -264,7 +264,7 @@ class HomeProductsManager {
                         class="reserve-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
                         data-id="${product.id || product.identifiant}"
                         data-name="${this.escapeHtml(product.libelle)}"
-                        data-price="${prix_promo || prix}"
+                        data-price="${product.prix_promo || product.prix}"
                         data-cip="${product.code_cip || product.cip}"
                     >
                         <span class="material-symbols-outlined text-sm">shopping_cart</span>
@@ -349,7 +349,7 @@ class HomeProductsManager {
 let homeProducts;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('✅ DOM chargé, initialisation du HomeProductsManager...');
+    console.log('✅ DOM chargé, initialisation du HomeProductsManager optimisé...');
     homeProducts = new HomeProductsManager();
     
     // Gestion du drawer panier

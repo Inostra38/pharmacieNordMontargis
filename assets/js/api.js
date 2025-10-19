@@ -1,10 +1,64 @@
 // ==========================================
 // Service API - Adapté pour Google Apps Script existant
+// VERSION OPTIMISÉE avec endpoint /home
 // ==========================================
 
 const apiService = {
     /**
-     * Récupérer tous les produits (via cache ou API)
+     * 🔥 NOUVEAU : Récupérer les produits optimisés pour la page d'accueil
+     * - Stock > 0 uniquement
+     * - Petits Prix OU Promos
+     * - Max 15 produits
+     * - Ultra-rapide (exit rapide côté backend)
+     */
+    async getHomeProducts() {
+        try {
+            // Vérifier que CONFIG est chargé
+            if (typeof CONFIG === 'undefined') {
+                console.error('❌ CONFIG n\'est pas défini. Assurez-vous que config.js est chargé avant api.js');
+                throw new Error('Configuration non chargée');
+            }
+
+            // Endpoint dédié ultra-rapide
+            const url = `${CONFIG.API.BASE_URL}?home=1&t=${Date.now()}`;
+            console.log('🏠 Requête API Home optimisée:', url);
+            
+            const startTime = performance.now();
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                redirect: 'follow'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            const endTime = performance.now();
+            const loadTime = Math.round(endTime - startTime);
+            
+            console.log(`✅ Données Home reçues en ${loadTime}ms`);
+            console.log(`📦 ${data.items?.length || 0} produits (Petits Prix + Promos en stock)`);
+            
+            return {
+                success: true,
+                data: {
+                    products: data.items || [],
+                    updatedAt: data.stockUpdatedAt || data.updatedAt,
+                    loadTime: loadTime
+                }
+            };
+            
+        } catch (error) {
+            console.error('❌ Erreur API getHomeProducts:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Récupérer tous les produits (route standard)
      */
     async getProducts(filters = {}) {
         try {
@@ -14,42 +68,47 @@ const apiService = {
                 throw new Error('Configuration non chargée');
             }
 
-            // Vérifier que le cache manager est chargé
-            if (typeof window.productCache === 'undefined') {
-                console.error('❌ Cache Manager non chargé');
-                throw new Error('Cache Manager non disponible');
-            }
-
-            console.log('🔍 getProducts appelé avec filtres:', filters);
-
-            // Charger les produits (cache ou API)
-            let items = await window.productCache.load(filters.forceRefresh);
-
-            if (!items || items.length === 0) {
-                throw new Error('Aucun produit disponible');
-            }
-
-            console.log('📦 Produits disponibles:', items.length);
-
-            // Appliquer les filtres côté client si nécessaire
+            // Construire l'URL avec les paramètres pour votre Google Apps Script
+            const params = new URLSearchParams();
+            
+            // Paramètre de recherche
             if (filters.search) {
-                const q = filters.search.toLowerCase();
-                items = items.filter(item =>
-                    (item.libelle || '').toLowerCase().includes(q) ||
-                    (item.cip || '').toLowerCase().includes(q) ||
-                    (item.marque || '').toLowerCase().includes(q)
-                );
+                params.append('q', filters.search);
             }
-
+            
+            // Limite et offset pour pagination
+            params.append('limit', filters.limit || 1000);
+            params.append('offset', filters.offset || 0);
+            
+            // Produits mis en avant uniquement
             if (filters.featured) {
-                items = items.filter(item => item.featured);
+                params.append('featured', '1');
             }
 
+            const url = `${CONFIG.API.BASE_URL}?${params.toString()}`;
+            console.log('📡 Requête API:', url);
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                redirect: 'follow'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Données brutes reçues:', data);
+            console.log('🔍 Premier item brut:', data.items?.[0]);
+            
             // Adapter le format de réponse pour le frontend
+            // Votre API retourne { items: [...], total: X, count: Y }
+            // Le frontend attend { success: true, data: { products: [...] } }
+            
             const adaptedData = {
                 success: true,
                 data: {
-                    products: items.map(item => ({
+                    products: (data.items || []).map(item => ({
                         // Mapping des champs de votre API vers le format attendu
                         identifiant: item.id,
                         libelle: item.libelle,
@@ -58,7 +117,7 @@ const apiService = {
                         prix_final: item.prix_promo || item.prix,
                         stock: item.stock,
                         fournisseur: item.marque,
-                        categorie: 'Général',
+                        categorie: 'Général', // Pas de catégorie dans votre API
                         image_url: item.image_url || CONFIG.IMAGE.PLACEHOLDER,
                         
                         // Promotion
@@ -80,15 +139,16 @@ const apiService = {
                         _raw: item
                     })),
                     pagination: {
-                        total: items.length,
-                        count: items.length,
-                        offset: 0,
-                        limit: items.length
+                        total: data.total || 0,
+                        count: data.count || 0,
+                        offset: data.offset || 0,
+                        limit: data.limit || 1000
                     }
                 }
             };
             
-            console.log('✅ Données adaptées:', adaptedData.data.products.length, 'produits');
+            console.log('✅ Données adaptées:', adaptedData);
+            console.log('🔍 Premier produit adapté:', adaptedData.data.products?.[0]);
             return adaptedData;
             
         } catch (error) {
@@ -128,14 +188,25 @@ const apiService = {
      */
     async getProductById(id) {
         try {
-            // Charger depuis le cache
-            const items = await window.productCache.load();
-            const product = items.find(item => item.id === id);
+            // Recherche par ID
+            const url = `${CONFIG.API.BASE_URL}?q=${id}&limit=1`;
+            console.log('📡 Requête API:', url);
             
-            if (product) {
+            const response = await fetch(url, {
+                method: 'GET',
+                redirect: 'follow'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.items && data.items.length > 0) {
                 return {
                     success: true,
-                    data: product
+                    data: data.items[0]
                 };
             }
             
@@ -154,25 +225,11 @@ const apiService = {
      * Récupérer les catégories (non disponible dans votre API)
      */
     async getCategories() {
+        // Votre API n'a pas de catégories, on retourne une liste vide
         return {
             success: true,
             data: []
         };
-    },
-
-    /**
-     * Forcer le rafraîchissement du cache
-     */
-    async refreshCache() {
-        try {
-            console.log('🔄 Rafraîchissement du cache...');
-            await window.productCache.load(true);
-            console.log('✅ Cache rafraîchi');
-            return true;
-        } catch (error) {
-            console.error('❌ Erreur rafraîchissement cache:', error);
-            return false;
-        }
     }
 };
 
@@ -181,4 +238,4 @@ if (typeof window !== 'undefined') {
     window.apiService = apiService;
 }
 
-console.log('✅ API Service chargé (adapté Google Apps Script)');
+console.log('✅ API Service chargé (version optimisée avec endpoint /home)');

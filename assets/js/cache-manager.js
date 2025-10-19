@@ -76,7 +76,16 @@ class ProductCacheManager {
     async load(forceRefresh = false) {
         if (this.isLoading) {
             console.log('⏳ Chargement déjà en cours...');
-            return null;
+            // Modification : retourner une promesse qui attend la fin du chargement en cours
+            return new Promise(resolve => {
+                const interval = setInterval(() => {
+                    if (!this.isLoading) {
+                        clearInterval(interval);
+                        const cached = this.get(); // Récupérer le résultat frais
+                        resolve(cached ? cached.products : []);
+                    }
+                }, 100);
+            });
         }
 
         // Essayer le cache d'abord
@@ -93,22 +102,28 @@ class ProductCacheManager {
 
         try {
             const url = new URL(CONFIG.API.BASE_URL);
-            url.searchParams.set('limit', '50000');
-            url.searchParams.set('t', Date.now());
+            url.searchParams.set('limit', '50000'); // Toujours charger tout
+            url.searchParams.set('t', Date.now()); // Cache busting
 
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+                throw new Error(`HTTP ${response.status} - ${response.statusText}`);
             }
 
             const data = await response.json();
+            // Vérification si la réponse est bien un objet avec 'items'
+            if (typeof data !== 'object' || data === null || !Array.isArray(data.items)) {
+                 console.error('❌ Réponse API invalide:', data);
+                 throw new Error('Format de réponse API incorrect reçu.');
+            }
+
             const products = data.items || [];
 
             console.log('✅ API:', products.length, 'produits reçus');
 
             // Sauvegarder dans le cache
             this.set(products, {
-                total: data.total,
+                total: data.total || products.length, // Utiliser la longueur si total manque
                 updatedAt: data.stockUpdatedAt || data.updatedAt
             });
 
@@ -116,18 +131,30 @@ class ProductCacheManager {
 
         } catch (error) {
             console.error('❌ Erreur chargement API:', error);
-            throw error;
+            // En cas d'erreur API, essayer de retourner un cache expiré s'il existe
+            const expiredCache = JSON.parse(localStorage.getItem(this.CACHE_KEY) || 'null');
+            if (expiredCache && expiredCache.products) {
+                console.warn('⚠️ Utilisation du cache expiré suite à une erreur API.');
+                return expiredCache.products;
+            }
+            throw error; // Relancer l'erreur si aucun cache n'est disponible
         } finally {
             this.isLoading = false;
         }
     }
 
+
     /**
      * Obtenir les métadonnées du cache
      */
     getMetadata() {
-        const cached = this.get();
-        return cached ? cached.metadata : null;
+        const cached = this.get(); // Utilise la logique de validation TTL
+        if (cached) {
+            return cached.metadata;
+        }
+        // Essayer de lire même si expiré pour avoir la dernière date connue
+        const expiredCache = JSON.parse(localStorage.getItem(this.CACHE_KEY) || 'null');
+        return expiredCache ? expiredCache.metadata : null;
     }
 
     /**
@@ -140,7 +167,13 @@ class ProductCacheManager {
 
 // Instance globale
 if (typeof window !== 'undefined') {
-    window.productCache = new ProductCacheManager();
+    // S'assurer que CONFIG est chargé avant d'instancier
+    if (typeof CONFIG !== 'undefined') {
+        window.productCache = new ProductCacheManager();
+        console.log('✅ Cache Manager instancié');
+    } else {
+        console.error('❌ CONFIG non défini avant Cache Manager. Vérifiez l\'ordre des scripts.');
+    }
+} else {
+     console.log('✅ Cache Manager chargé (environnement non-navigateur)');
 }
-
-console.log('✅ Cache Manager chargé');
