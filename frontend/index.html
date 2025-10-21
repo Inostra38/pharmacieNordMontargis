@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pharmacie Nord Montargis | Votre Santé, Notre Priorité</title>
+
+    <!-- SEO optimisé -->
+    <meta name="description"
+        content="Pharmacie Nord Montargis à Châlette-sur-Loing - Services pharmaceutiques, vaccination, aromathérapie, orthopédie, livraison gratuite. Votre santé, notre priorité.">
+    <meta name="keywords"
+        content="pharmacie, Montargis, Châlette-sur-Loing, vaccination, médicaments, aromathérapie, orthopédie, livraison domicile">
+    <meta name="author" content="Pharmacie Nord Montargis">
+
+    <!-- Open Graph pour réseaux sociaux -->
+    <meta property="og:title" content="Pharmacie Nord Montargis | Votre Santé, Notre Priorité">
+    <meta property="og:description"
+        content="Votre pharmacie de confiance à Châlette-sur-Loing. Services professionnels et conseils personnalisés.">
+    <meta property="og:image" content="assets/logo_pharmacie_nord_montargis.webp">
+    <meta property="og:url" content="https://www.pharmacienordmontargis.fr">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fr_FR">
+
+    <!-- Preconnect pour optimisation -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Préchargement des ressources critiques -->
+    <link rel="preload" href="assets/logo_pharmacie_nord_montargis.webp" as="image">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="light-mode-colors.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        title: ['Poppins', 'sans-serif'],
+                        body: ['Open Sans', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors-slow">
+
+    <!-- Navbar améliorée -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors-slow" role="navigation"
+        aria-label="Navigation principale">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-title font-bold text-teal-700 dark:text-teal-300">Pharmacie Nord Montargis</h1>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Lien vers le catalogue -->
+                    <a href="catalogue.html"
+                        class="hidden sm:flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition font-medium"
+                        aria-label="Accéder au catalogue de produits">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                        <span>Catalogue</span>
+                    </a>
+
+                    <!-- Icône Panier -->
+                    <button id="cartButton"
+                        class="relative text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition">
+                        <span class="material-symbols-outlined text-3xl">shopping_cart</span>
+                        <span id="cartBadge"
+                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">
+                            0
+                        </span>
+                    </button>
+
+                    <!-- Dark mode toggle -->
+                    <button id="darkToggle"
+                        class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-3 py-1 rounded-full shadow font-bold flex items-center justify-center w-10 h-10 hover:scale-105 transition-transform"
+                        aria-label="Basculer le mode sombre">
+                        <span id="darkIcon" class="text-xl">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BANDEAU D'INFORMATION -->
+        <div id="infoBandeau" class="bg-gradient-to-r from-blue-600 to-teal-600 text-white z-40 relative">
+            <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center">
+                    <span class="mr-2 animate-pulse-badge bg-yellow-400 text-blue-800 rounded-full p-1"
+                        aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    <p class="text-xs md:text-sm font-medium flex-grow">
+                        <strong>Livraison gratuite pour les patients à mobilité réduite.</strong>
+                        <a href="https://calendar.google.com/calendar/u/0/appointments/AcZssZ35q_LtxK-0uDeNZ64foIqpjBOnTG3np7Mjyno=?gv=true"
+                            class="underline hover:text-yellow-200 transition-colors ml-2 font-semibold"
+                            aria-label="Réserver un créneau de livraison">
+                            Réserver un créneau &raquo;
+                        </a>
+                    </p>
+                </div>
+                <button id="closeBandeau"
+                    class="ml-4 flex-shrink-0 rounded-full p-1 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    aria-label="Fermer le bandeau d'information">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section optimisée -->
+    <section class="relative gradient-animation text-white py-12 md:py-16 transition-colors-slow">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-center gap-8">
+
+            <!-- Logo pharmacie -->
+            <div
+                class="flex-shrink-0 w-40 h-40 sm:w-52 sm:h-52 lg:w-64 lg:h-64 bg-white dark:bg-gray-700 rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center hover-lift">
+                <img src="assets/logo_pharmacie_nord_montargis.webp" alt="Logo Pharmacie Nord Montargis"
+                    class="w-full h-full object-contain p-3" loading="eager" />
+            </div>
+
+            <!-- Contenu de présentation -->
+            <div class="text-center lg:text-left space-y-3 sm:space-y-4">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-title font-bold">Pharmacie Nord Montargis</h2>
+
+                <!-- Logos réseaux sociaux Instagram & WhatsApp -->
+                <div class="flex justify-center lg:justify-start gap-3 py-2">
+                    <a href="https://www.instagram.com/pharmacienordmontargis/" target="_blank"
+                        rel="noopener noreferrer"
+                        class="group flex items-center justify-center w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-110"
+                        aria-label="Suivez-nous sur Instagram">
+                        <svg class="w-5 h-5 text-white group-hover:text-pink-300 transition-colors" fill="currentColor"
+                            viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                        </svg>
+                    </a>
+
+                    <a href="https://wa.me/33686202618" target="_blank" rel="noopener noreferrer"
+                        class="group flex items-center justify-center w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-110"
+                        aria-label="Contactez-nous sur WhatsApp">
+                        <svg class="w-5 h-5 text-white group-hover:text-green-300 transition-colors" fill="currentColor"
+                            viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                        </svg>
+                    </a>
+                </div>
+
+                <p class="text-base md:text-lg italic">CC Carrefour Market, Chalette-sur-Loing 45120</p>
+                <p class="text-base sm:text-lg md:text-xl font-body opacity-90 max-w-xl">
+                    Votre partenaire santé au quotidien : médicaments, conseils, services personnalisés, et bien plus
+                    encore.
+                </p>
+
+                <!-- Boutons d'action principaux optimisés -->
+                <div class="flex flex-col sm:flex-row flex-wrap gap-3 justify-center lg:justify-start mt-6">
+
+                    <a href="secure.ordonnance.html"
+                        class="bg-white dark:bg-gray-700 text-red-700 dark:text-red-300 border-2 border-red-600 dark:border-red-400 hover:bg-red-50 dark:hover:bg-gray-600 font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base hover-lift"
+                        aria-label="Envoyer une ordonnance sécurisée">
+                        <span class="material-symbols-outlined text-xl" aria-hidden="true">upload_file</span>
+                        <span>Envoyer mon ordonnance</span>
+                    </a>
+
+                    <a href="https://calendar.google.com/calendar/u/0/appointments/AcZssZ35q_LtxK-0uDeNZ64foIqpjBOnTG3np7Mjyno=?gv=true"
+                        target="_blank" rel="noopener noreferrer"
+                        class="btn-primary bg-teal-900 dark:bg-teal-800 text-white hover:bg-teal-800 dark:hover:bg-teal-700 font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base hover-lift"
+                        aria-label="Prendre rendez-vous en ligne">
+                        <span class="material-symbols-outlined text-xl" aria-hidden="true">calendar_month</span>
+                        <span>Prendre rendez-vous</span>
+                    </a>
+
+                    <a href="catalogue.html"
+                        class="bg-white dark:bg-gray-700 text-teal-700 dark:text-teal-300 border-2 border-teal-600 dark:border-teal-400 hover:bg-teal-50 dark:hover:bg-gray-600 font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base hover-lift"
+                        aria-label="Consulter le catalogue de produits">
+                        <span class="material-symbols-outlined text-xl" aria-hidden="true">inventory_2</span>
+                        <span>Voir le catalogue produits</span>
+                    </a>
+
+                    <a href="https://avantages.pharmacorp.fr/application/login" target="_blank"
+                        rel="noopener noreferrer"
+                        class="bg-yellow-400 dark:bg-yellow-500 text-teal-800 hover:bg-yellow-300 dark:hover:bg-yellow-400 font-bold px-6 py-3 sm:px-5 sm:py-3 rounded-xl shadow-xl transition flex items-center justify-center gap-2 text-sm sm:text-base"
+                        aria-label="Accéder au programme Avantages Pharmacorp">
+                        <span class="material-symbols-outlined text-xl" aria-hidden="true">card_membership</span>
+                        <span>Programme Avantages Pharmacorp</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vague décorative -->
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180" aria-hidden="true">
+            <svg class="relative block w-[200%] h-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
+                preserveAspectRatio="none">
+                <path
+                    d="M0,0V46.29c47.79,22,103.79,29.05,158,17.58C230.91,50.53,284,7.62,339.65,1.43c71.73-8.4,136.76,39.3,207.7,35.36,62.9-3.52,113.45-45.19,172.29-56.69,59.63-11.7,117.24,17.47,173.62,35.21,43.84,13.63,87.55,16.78,131.45,5.43V0Z"
+                    opacity=".1" fill="#ffffff"></path>
+                <path
+                    d="M0,0V15.81C47.42,35.75,103.63,48.13,158,43.91c65.84-5.38,113.21-35.27,177.69-39.45,59.15-3.87,113.28,23.64,168.49,38.41,30.75,8.18,62.09,6.26,93.4-2.57,50.13-14.23,98.18-40.91,150.21-44.68,46.74-3.33,92.11,15.68,137.2,30.34,47.41,15.36,94.62,25.33,143.02,27.29V0Z"
+                    opacity=".3" fill="#ffffff"></path>
+                <path
+                    d="M0,0V5.63C63.84,27.19,139.33,48.57,218,45.26c63.28-2.74,120.9-27.37,184-36.94,58.23-8.75,114.22,12.29,172.4,19.24,31.15,3.7,61.63,1.33,92.24-2.6,54.3-6.83,104.88-27.35,159.3-28.49,47.28-.99,92.78,16.26,137.34,33.32,66.92,26.28,131.9,36.27,197.72,27.84V0Z"
+                    fill="#ffffff"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Contenu principal -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+
+        <!-- Section coordonnées et horaires regroupées -->
+        <section id="contact" class="mb-8 scroll-offset">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Coordonnées -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow hover-lift transition-colors-slow">
+                    <h2 class="text-2xl font-title text-teal-700 dark:text-teal-300 mb-6 flex items-center">
+                        <span class="material-symbols-outlined mr-2" aria-hidden="true">contact_page</span>
+                        Coordonnées
+                    </h2>
+
+                    <div class="space-y-4">
+                        <!-- Email -->
+                        <div
+                            class="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 dark:bg-gray-700 p-4 rounded-lg gap-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="material-symbols-outlined text-teal-600" aria-hidden="true">email</span>
+                                <div>
+                                    <p id="email" class="font-medium text-teal-700 dark:text-teal-300 break-all">
+                                        contact@pharmacienordmontargis.fr</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Réponse sous 24h</p>
+                                </div>
+                            </div>
+                            <button onclick="copyEmail()"
+                                class="btn-primary bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-1 text-sm transition-colors flex-shrink-0"
+                                aria-label="Copier l'adresse email">
+                                <span class="material-symbols-outlined text-sm" aria-hidden="true">content_copy</span>
+                                <span>Copier</span>
+                            </button>
+                        </div>
+
+                        <!-- Téléphone -->
+                        <div
+                            class="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 dark:bg-gray-700 p-4 rounded-lg gap-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="material-symbols-outlined text-teal-600" aria-hidden="true">call</span>
+                                <div>
+                                    <p class="font-medium dark:text-gray-200">02 38 85 22 81</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Appel gratuit</p>
+                                </div>
+                            </div>
+                            <a href="tel:+33238852281"
+                                class="btn-primary bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-1 text-sm transition-colors flex-shrink-0"
+                                aria-label="Appeler la pharmacie">
+                                <span class="material-symbols-outlined text-sm" aria-hidden="true">call</span>
+                                <span>Appeler</span>
+                            </a>
+                        </div>
+
+                        <!-- Adresse -->
+                        <div
+                            class="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 dark:bg-gray-700 p-4 rounded-lg gap-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="material-symbols-outlined text-teal-600" aria-hidden="true">home</span>
+                                <div>
+                                    <p class="font-medium dark:text-gray-200">CC Carrefour Market</p>
+                                    <p class="font-medium dark:text-gray-200">17 av du Général Leclerc</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">45120 Châlette-sur-Loing</p>
+                                </div>
+                            </div>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=17+avenue+du+général+Leclerc,45120+Chalette-sur-Loing"
+                                target="_blank" rel="noopener noreferrer"
+                                class="btn-primary bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-1 text-sm transition-colors flex-shrink-0"
+                                aria-label="Obtenir l'itinéraire vers la pharmacie">
+                                <span class="material-symbols-outlined text-sm" aria-hidden="true">directions</span>
+                                <span>Y aller</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Horaires optimisés -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow hover-lift transition-colors-slow">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-title text-teal-700 dark:text-teal-300 flex items-center">
+                            <span class="material-symbols-outlined mr-2" aria-hidden="true">schedule</span>
+                            Horaires
+                        </h2>
+                        <span id="statusBadge" class="text-sm font-semibold px-3 py-1 rounded-full"
+                            role="status"></span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Lundi - Vendredi -->
+                        <div
+                            class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+                            <span class="font-medium">Lundi - Vendredi</span>
+                            <div class="text-right flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                <span class="text-teal-600 dark:text-teal-400 font-medium">9h00 - 13h00</span>
+                                <span class="text-gray-400 hidden sm:inline" aria-hidden="true">•</span>
+                                <span class="text-teal-600 dark:text-teal-400 font-medium">14h00 - 19h00</span>
+                            </div>
+                        </div>
+
+                        <!-- Samedi -->
+                        <div
+                            class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+                            <span class="font-medium">Samedi</span>
+                            <span class="text-teal-600 dark:text-teal-400 font-medium">10h00 - 17h00</span>
+                        </div>
+
+                        <!-- Dimanche -->
+                        <div class="flex justify-between items-center py-2">
+                            <span class="font-medium">Dimanche</span>
+                            <span class="text-gray-500 dark:text-gray-400">Fermé</span>
+                        </div>
+                    </div>
+
+                    <!-- Informations importantes sous les horaires -->
+                    <div class="mt-6 space-y-3">
+                        <!-- Info 1: Vaccination et Entretiens sur RDV -->
+                        <div class="p-4 bg-teal-50 dark:bg-teal-900 rounded-lg hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-start flex-1">
+                                    <span
+                                        class="material-symbols-outlined text-lg mr-2 text-teal-600 dark:text-teal-300 flex-shrink-0"
+                                        aria-hidden="true">vaccines</span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-teal-800 dark:text-teal-200 mb-1">
+                                            Vaccination & Entretiens pharmaceutiques
+                                        </p>
+                                        <p class="text-xs text-teal-700 dark:text-teal-300">
+                                            Sur rendez-vous - Grippe, Covid-19, Zona, HPV, etc.
+                                        </p>
+                                    </div>
+                                </div>
+                                <a href="https://calendar.google.com/calendar/appointments/AcZssZ35q_LtxK-0uDeNZ64foIqpjBOnTG3np7Mjyno=?gv=true"
+                                    target="_blank" rel="noopener noreferrer"
+                                    class="flex-shrink-0 inline-flex items-center gap-1 bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                                    aria-label="Prendre rendez-vous pour vaccination ou entretien">
+                                    <span class="material-symbols-outlined text-sm"
+                                        aria-hidden="true">calendar_month</span>
+                                    <span class="hidden sm:inline">Réserver</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Info 2: Tests Rapides sans RDV -->
+                        <div class="p-4 bg-red-50 dark:bg-red-900 rounded-lg hover:shadow-md transition-shadow">
+                            <div class="flex items-start">
+                                <span
+                                    class="material-symbols-outlined text-lg mr-2 text-red-600 dark:text-red-300 flex-shrink-0"
+                                    aria-hidden="true">biotech</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-red-800 dark:text-red-200 mb-1">
+                                        Tests rapides Grippe / Covid-19
+                                    </p>
+                                    <p class="text-xs text-red-700 dark:text-red-300">
+                                        Sans rendez-vous - Résultats en 15 minutes - Aux heures d'ouverture
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section Produits Mis en Avant (Dynamique) -->
+        <section class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-lg transition-all duration-300 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl sm:text-2xl font-bold text-teal-700 dark:text-teal-300 flex items-center gap-2">
+                    <span class="text-2xl" role="img" aria-label="Promotion">🔥</span>
+                    Promotions en cours
+                </h2>
+                <button id="refreshBtn"
+                    class="text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-200 p-2 rounded-full hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
+                    aria-label="Actualiser les produits">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Grille des produits (remplie dynamiquement par home.js) -->
+            <div id="promotionsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <!-- Les produits seront insérés ici par JavaScript -->
+            </div>
+
+            <!-- Message d'état -->
+            <div id="statusMessage" class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400 hidden">
+                <span id="statusText"></span>
+            </div>
+        </section>
+
+        <!-- Bouton vers le catalogue complet -->
+        <div class="text-center mb-8">
+            <a href="catalogue.html"
+                class="inline-flex items-center gap-3 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                aria-label="Consulter l'intégralité du catalogue">
+                <span class="material-symbols-outlined text-2xl" aria-hidden="true">inventory_2</span>
+                <span>Voir tout le catalogue</span>
+                <span class="material-symbols-outlined text-2xl" aria-hidden="true">arrow_forward</span>
+            </a>
+        </div>
+
+        <!-- Section Le Mot du Pharmacien -->
+        <section
+            class="bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 p-6 sm:p-8 rounded-xl shadow-lg transition-all duration-300 border border-teal-100 dark:border-teal-800 mb-8">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+                <!-- Photo du pharmacien -->
+                <div class="flex-shrink-0 mx-auto lg:mx-0">
+                    <div class="relative">
+                        <img src="https://randomuser.me/api/portraits/men/78.jpg"
+                            alt="Portrait du pharmacien Dr Steeve H."
+                            class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full object-cover border-4 border-white dark:border-gray-600 shadow-lg"
+                            loading="lazy" />
+                        <div class="absolute -bottom-1 -right-1 w-6 h-6 sm:w-8 sm:h-8 bg-teal-500 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-600"
+                            aria-label="Vérifié">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenu du message -->
+                <div class="flex-1 text-center lg:text-left">
+                    <div class="flex items-center justify-center lg:justify-start gap-2 mb-3">
+                        <h2 class="text-xl sm:text-2xl font-bold text-teal-700 dark:text-teal-300">
+                            Le Mot du pharmacien
+                        </h2>
+                        <span class="text-2xl" role="img" aria-label="Pharmacien">💊</span>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm relative">
+                        <div class="absolute -left-2 top-6 w-4 h-4 bg-white dark:bg-gray-800 transform rotate-45 border-l border-t border-gray-200 dark:border-gray-700 hidden lg:block"
+                            aria-hidden="true"></div>
+
+                        <blockquote
+                            class="italic text-gray-700 dark:text-gray-300 mb-4 text-sm sm:text-base leading-relaxed">
+                            "Votre santé est notre priorité. N'hésitez pas à nous solliciter pour tous vos besoins en
+                            conseils pharmaceutiques. Notre équipe est là pour vous accompagner au quotidien."
+                        </blockquote>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div class="text-center sm:text-left">
+                                <p class="font-semibold text-teal-700 dark:text-teal-300 text-sm sm:text-base">
+                                    Dr Steeve H.
+                                </p>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                                    Pharmacien titulaire • 19 ans d'expérience
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Nos Services -->
+        <section class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg transition-all duration-300 mb-8">
+            <h2 class="text-2xl sm:text-3xl font-title text-center text-teal-700 dark:text-teal-300 mb-8">
+                🌟 Nos Services
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Aromathérapie -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-4xl" aria-hidden="true">🌿</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Aromathérapie</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Huiles essentielles et conseils personnalisés
+                        pour votre bien-être naturel.</p>
+                </div>
+
+                <!-- Orthopédie -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons text-4xl text-blue-600 dark:text-blue-300"
+                            aria-hidden="true">accessible</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Orthopédie</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Attelles, orthèses, semelles et matériel
+                        orthopédique sur mesure.</p>
+                </div>
+
+                <!-- Vaccination -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-teal-100 to-teal-200 dark:from-teal-900 dark:to-teal-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons text-4xl text-teal-600 dark:text-teal-300"
+                            aria-hidden="true">vaccines</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Vaccination</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Grippe, Covid-19, zona... Vaccination sans
+                        rendez-vous tous les jours.</p>
+                </div>
+
+                <!-- Suivi Cancer -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-pink-100 to-pink-200 dark:from-pink-900 dark:to-pink-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons text-4xl text-pink-600 dark:text-pink-300"
+                            aria-hidden="true">favorite</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Suivi Cancer</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Accompagnement personnalisé, conseils
+                        nutritionnels et chimiothérapie orale.</p>
+                </div>
+
+                <!-- Vétérinaire -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-4xl" aria-hidden="true">🐾</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Vétérinaire</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Produits de santé et soins pour vos animaux de
+                        compagnie.</p>
+                </div>
+
+                <!-- Suivi Grossesse -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons text-4xl text-purple-600 dark:text-purple-300"
+                            aria-hidden="true">pregnant_woman</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Grossesse & Maternité</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Suivi personnalisé, conseils et produits pour
+                        futures et jeunes mamans.</p>
+                </div>
+
+                <!-- Tests Rapides -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons text-4xl text-red-600 dark:text-red-300"
+                            aria-hidden="true">biotech</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Tests Rapides</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Covid-19, angines, grippe... Résultats en
+                        quelques minutes.</p>
+                </div>
+
+                <!-- Livraison -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-cyan-100 to-cyan-200 dark:from-cyan-900 dark:to-cyan-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons text-4xl text-cyan-600 dark:text-cyan-300"
+                            aria-hidden="true">local_shipping</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Livraison à Domicile</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Recevez vos médicaments directement chez vous,
+                        rapidement et en toute sécurité.</p>
+                </div>
+
+                <!-- Bien-être Séniors -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-900 dark:to-indigo-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons text-4xl text-indigo-600 dark:text-indigo-300"
+                            aria-hidden="true">elderly</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Bien-être des Séniors</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Piluliers, maintien à domicile et conseils
+                        adaptés aux personnes âgées.</p>
+                </div>
+
+                <!-- Matériel Médical -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center border border-gray-100 dark:border-gray-700 group hover:border-teal-500 dark:hover:border-teal-400">
+                    <div
+                        class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons text-4xl text-gray-600 dark:text-gray-300"
+                            aria-hidden="true">medical_services</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Matériel Médical</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Location et vente : fauteuils, lits médicalisés,
+                        aérosols, tensiomètres...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Réseaux sociaux -->
+        <section
+            class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg hover-lift transition-all duration-300 mb-8">
+            <div class="text-center">
+                <h2 class="text-2xl font-title text-teal-700 dark:text-teal-300 mb-2 flex items-center justify-center">
+                    <span class="material-icons mr-2" aria-hidden="true">share</span>
+                    Nous Suivre
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+                    Restez connectés avec notre pharmacie ! Suivez-nous sur les réseaux sociaux pour nos actualités,
+                    conseils santé et promotions.
+                </p>
+            </div>
+
+            <!-- Réseaux sociaux -->
+            <div class="flex justify-center gap-4 sm:gap-6 flex-wrap">
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/pharmacienordmontargis/" target="_blank" rel="noopener noreferrer"
+                    class="social-btn group relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 hover:from-pink-600 hover:via-red-600 hover:to-yellow-600 text-white transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                    aria-label="Suivez-nous sur Instagram">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                    </svg>
+                    <span
+                        class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-600 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                        Instagram
+                    </span>
+                </a>
+
+                <!-- WhatsApp -->
+                <a href="https://wa.me/33686202618" target="_blank" rel="noopener noreferrer"
+                    class="social-btn group relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                    aria-label="Contactez-nous sur WhatsApp">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                    </svg>
+                    <span
+                        class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-600 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                        WhatsApp
+                    </span>
+                </a>
+            </div>
+        </section>
+
+
+        <!-- Section Avis clients -->
+        <section
+            class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow hover-lift transition-all duration-300 mb-8">
+            <div class="flex flex-col lg:flex-row lg:space-x-6 gap-6">
+                <!-- Bloc avis Google -->
+                <div class="lg:w-7/12">
+                    <h2 class="text-xl sm:text-2xl font-title text-teal-700 dark:text-teal-300 mb-4">🌟 Avis Google</h2>
+
+                    <div class="space-y-4">
+                        <blockquote
+                            class="p-4 border-l-4 border-teal-600 bg-gradient-to-r from-teal-50 to-teal-25 dark:from-teal-900 dark:to-teal-800 rounded-r-lg hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div
+                                        class="w-8 h-8 bg-teal-100 dark:bg-teal-700 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-teal-600 dark:text-teal-300 font-semibold text-sm">DT</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-sm text-gray-800 dark:text-gray-200">David T.</p>
+                                        <div class="flex text-yellow-400 text-xs" aria-label="5 étoiles">★★★★★</div>
+                                    </div>
+                                </div>
+                                <time class="text-xs text-gray-500 dark:text-gray-400" datetime="2025-10-12">Octobre
+                                    2025</time>
+                            </div>
+                            <p class="italic text-gray-700 dark:text-gray-200 text-sm">"Excellente nouvelle : le nouveau
+                                pharmacien est un excellent praticien qui prends le temps de parler avec les gens (et
+                                souriant ! Si si !!) Une nouveauté bienvenue quand on se souvient de l'équipe
+                                précédente…."</p>
+                        </blockquote>
+
+                        <blockquote
+                            class="p-4 border-l-4 border-teal-600 bg-gradient-to-r from-teal-50 to-teal-25 dark:from-teal-900 dark:to-teal-800 rounded-r-lg hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div
+                                        class="w-8 h-8 bg-teal-100 dark:bg-teal-700 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-teal-600 dark:text-teal-300 font-semibold text-sm">AK</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-sm text-gray-800 dark:text-gray-200">Amadou K.</p>
+                                        <div class="flex text-yellow-400 text-xs" aria-label="5 étoiles">★★★★★</div>
+                                    </div>
+                                </div>
+                                <time class="text-xs text-gray-500 dark:text-gray-400" datetime="2025-10-09">Octobre
+                                    2025</time>
+                            </div>
+                            <p class="italic text-gray-700 dark:text-gray-200 text-sm">"Je suis revenu depuis le
+                                changement de propriétaire et franchement ça fait plaisir ! Le nouveau pharmacien est
+                                accueillant, souriant et de très bon conseil. On sent qu'il prend le temps avec ses
+                                clients, ça change tout. Je recommande vivement, ça fait plaisir d'avoir retrouvé une
+                                vraie pharmacie de proximité."</p>
+                        </blockquote>
+
+                        <blockquote
+                            class="p-4 border-l-4 border-teal-600 bg-gradient-to-r from-teal-50 to-teal-25 dark:from-teal-900 dark:to-teal-800 rounded-r-lg hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div
+                                        class="w-8 h-8 bg-teal-100 dark:bg-teal-700 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-teal-600 dark:text-teal-300 font-semibold text-sm">MB</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-sm text-gray-800 dark:text-gray-200">Marie-Jane B.
+                                        </p>
+                                        <div class="flex text-yellow-400 text-xs" aria-label="5 étoiles">★★★★★</div>
+                                    </div>
+                                </div>
+                                <time class="text-xs text-gray-500 dark:text-gray-400" datetime="2025-10-07">Septembre
+                                    2025</time>
+                            </div>
+                            <p class="italic text-gray-700 dark:text-gray-200 text-sm">"Le nouveau pharmacien est de bon
+                                conseil et est à l'écoute des clients. Il est très aimable.
+                                La pharmacie est en cours de restructuration. Elle sera plus spacieuse et plus agréable.
+                                Je n'hésiterai pas à y retourner."</p>
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- Bloc laisser un avis -->
+                <div
+                    class="lg:w-5/12 flex flex-col justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-gray-700 dark:to-gray-600 p-4 sm:p-6 rounded-xl shadow-inner">
+                    <div class="text-center">
+                        <div
+                            class="w-16 h-16 bg-teal-100 dark:bg-teal-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl" aria-hidden="true">✏️</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-title text-teal-700 dark:text-teal-300 mb-3">Laissez-nous un
+                            avis</h2>
+                        <p class="text-gray-600 dark:text-gray-300 mb-6">Votre avis compte beaucoup pour nous !
+                            Aidez-nous à améliorer nos services.</p>
+                        <a href="https://g.page/r/Cb7XE6vYRW1QEBM/review" target="_blank" rel="noopener noreferrer"
+                            class="inline-flex items-center justify-center bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                            aria-label="Laisser un avis sur Google">
+                            <span class="mr-2" aria-hidden="true">⭐️</span>
+                            Laisser un avis Google
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Carte Google Maps -->
+        <section class="mb-8">
+            <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow hover-lift transition-all duration-300">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl sm:text-2xl font-title text-teal-700 dark:text-teal-300">📍 Nous trouver</h2>
+                    <a href="https://www.google.com/maps/dir//17+av+General+Leclerc+45120+Chalette-sur-Loing"
+                        target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center text-teal-600 dark:text-teal-300 hover:text-teal-700 dark:hover:text-teal-200 text-sm font-medium transition-colors"
+                        aria-label="Obtenir l'itinéraire">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        Itinéraire
+                    </a>
+                </div>
+
+                <div class="map-container">
+                    <iframe width="100%" height="350" frameborder="0"
+                        style="border:0; filter: grayscale(100%) contrast(90%); border-radius: 0.75rem;"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        src="https://www.google.com/maps?q=Pharmacie+Nord+Montargis,17+avenue+du+général+Leclerc,45120+Chalette-sur-Loing&output=embed"
+                        allowfullscreen loading="lazy" title="Localisation de la Pharmacie Nord Montargis">
+                    </iframe>
+                </div>
+
+                <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                        <svg class="w-4 h-4 mr-2 text-teal-600 dark:text-teal-300 flex-shrink-0" fill="currentColor"
+                            viewBox="0 0 20 20" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="font-medium">CC Commercial Carrefour Market, 17 avenue du Général Leclerc, 45120
+                            Châlette-sur-Loing</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION LIENS UTILES - VERSION DISCRÈTE -->
+        <section class="mb-8">
+            <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
+
+                <!-- Titre discret -->
+                <h3 class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg" aria-hidden="true">link</span>
+                    Liens utiles
+                </h3>
+
+                <!-- Grille compacte des liens -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+
+                    <!-- ANSM -->
+                    <a href="https://ansm.sante.fr/" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors text-xs group border border-gray-200 dark:border-gray-600"
+                        aria-label="Visiter le site de l'ANSM">
+                        <div
+                            class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+                            <span class="material-symbols-outlined text-base text-blue-600 dark:text-blue-400"
+                                aria-hidden="true">medication</span>
+                        </div>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">ANSM</span>
+                    </a>
+
+                    <!-- ARS -->
+                    <a href="https://www.centre-val-de-loire.ars.sante.fr/" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded-lg hover:bg-green-50 dark:hover:bg-gray-600 transition-colors text-xs group border border-gray-200 dark:border-gray-600"
+                        aria-label="Visiter le site de l'ARS Centre-Val de Loire">
+                        <div
+                            class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
+                            <span class="material-symbols-outlined text-base text-green-600 dark:text-green-400"
+                                aria-hidden="true">local_hospital</span>
+                        </div>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">ARS</span>
+                    </a>
+
+                    <!-- Santé.gouv -->
+                    <a href="https://sante.gouv.fr/" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded-lg hover:bg-purple-50 dark:hover:bg-gray-600 transition-colors text-xs group border border-gray-200 dark:border-gray-600"
+                        aria-label="Visiter le site du Ministère de la Santé">
+                        <div
+                            class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
+                            <span class="material-symbols-outlined text-base text-purple-600 dark:text-purple-400"
+                                aria-hidden="true">account_balance</span>
+                        </div>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Santé.gouv</span>
+                    </a>
+
+                    <!-- Ameli -->
+                    <a href="https://www.ameli.fr/loiret/assure" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded-lg hover:bg-cyan-50 dark:hover:bg-gray-600 transition-colors text-xs group border border-gray-200 dark:border-gray-600"
+                        aria-label="Visiter le site Ameli Loiret">
+                        <div
+                            class="w-8 h-8 bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-cyan-200 dark:group-hover:bg-cyan-800 transition-colors">
+                            <span class="material-symbols-outlined text-base text-cyan-600 dark:text-cyan-400"
+                                aria-hidden="true">health_and_safety</span>
+                        </div>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Ameli</span>
+                    </a>
+
+                </div>
+
+                <!-- Numéro d'agrément discret -->
+                <div
+                    class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                        <span class="material-symbols-outlined text-sm text-teal-600 dark:text-teal-400"
+                            aria-hidden="true">verified</span>
+                        <span>Pharmacie agréée • N° <span
+                                class="font-mono font-semibold text-gray-700 dark:text-gray-300">45-XXXXX</span></span>
+                    </div>
+                    <a href="https://www.ordre.pharmacien.fr/je-suis/patient-grand-public/l-annuaire-des-pharmaciens-etablissements"
+                        target="_blank" rel="noopener noreferrer"
+                        class="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium flex items-center gap-1"
+                        aria-label="Vérifier notre agrément">
+                        <span>Vérifier</span>
+                        <span class="material-symbols-outlined text-sm" aria-hidden="true">open_in_new</span>
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer
+        class="bg-gradient-to-r from-teal-700 to-teal-800 dark:from-teal-900 dark:to-teal-950 text-white py-8 transition-colors-slow"
+        role="contentinfo">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <!-- Informations principales -->
+                <div>
+                    <h3 class="font-title text-lg mb-4 flex items-center justify-center md:justify-start">
+                        <span class="text-2xl mr-2" aria-hidden="true">💊</span>Pharmacie Nord Montargis
+                    </h3>
+                    <p class="text-teal-100 text-sm leading-relaxed">
+                        Votre pharmacie de confiance au cœur du bassin Montargois. Votre santé, votre bien-être.
+                    </p>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-title text-lg mb-4">Contact</h4>
+                    <div class="space-y-2 text-teal-100 text-sm">
+                        <p class="flex items-center justify-center md:justify-start">
+                            <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
+                                aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            <span>17 Avenue du Général Leclerc, 45120 Châlette-sur-Loing</span>
+                        </p>
+                        <p class="flex items-center justify-center md:justify-start">
+                            <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
+                                aria-hidden="true">
+                                <path
+                                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z">
+                                </path>
+                            </svg>
+                            <a href="tel:+33238852281" class="hover:text-white transition-colors">02 38 85 22 81</a>
+                        </p>
+                        <p class="flex items-center justify-center md:justify-start">
+                            <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
+                                aria-hidden="true">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                            </svg>
+                            <a href="mailto:contact@pharmacienordmontargis.fr"
+                                class="hover:text-white transition-colors break-all">contact@pharmacienordmontargis.fr</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Horaires -->
+                <div>
+                    <h4 class="font-title text-lg mb-4">Horaires</h4>
+                    <div class="text-teal-100 text-sm space-y-1">
+                        <p><strong>Lun - Ven :</strong> 9h00 - 13h00 • 14h00 - 19h00</p>
+                        <p><strong>Samedi :</strong> 10h00 - 17h00</p>
+                        <p><strong>Dimanche :</strong> Fermé</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-teal-600 mt-8 pt-6 text-center">
+                <p class="text-teal-100 text-sm">
+                    &copy; 2025 Pharmacie Nord Montargis. Tous droits réservés. |
+                    <a href="#" class="hover:text-white transition-colors">Mentions légales</a> |
+                    <a href="#" class="hover:text-white transition-colors">Politique de confidentialité</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Overlay Panier -->
+    <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
+
+    <!-- Drawer Panier (Gauche) -->
+    <div id="cartDrawer"
+        class="fixed top-0 left-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl transform -translate-x-full transition-transform duration-300 z-50 flex flex-col">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <h2 class="text-2xl font-title font-bold text-gray-800 dark:text-white">🛒 Mon Panier</h2>
+            <button id="closeCart"
+                class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-3xl leading-none">×</button>
+        </div>
+
+        <div id="cartItems" class="flex-1 overflow-y-auto p-6">
+            <p class="text-center text-gray-500 dark:text-gray-400 py-8">Votre panier est vide</p>
+        </div>
+
+        <div class="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-lg font-semibold">Total</span>
+                <span id="cartTotal" class="text-2xl font-bold text-teal-600 dark:text-teal-400">0,00 €</span>
+            </div>
+            <button id="validateCart"
+                class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition">
+                Valider la réservation
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/cache-manager.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/cart-v2.js"></script>
+    <script src="assets/js/home.js"></script>
+    <script src="assets/js/script.js" defer></script>
+
+</body>
+
+</html>
