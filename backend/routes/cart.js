@@ -20,7 +20,7 @@ const formatPrice = (price) => {
  * Crée le corps HTML de l'e-mail pour le PHARMACIEN (Simplifié)
  */
 const createPharmacistEmail = (details) => {
-    const { name, email, message, items, total } = details;
+    const { name, phone, email, message, items, total } = details; // MODIFICATION : Ajout de phone
 
     return `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -30,6 +30,7 @@ const createPharmacistEmail = (details) => {
         <h2>Informations Client</h2>
         <ul>
           <li><strong>Nom :</strong> ${name}</li>
+          <li><strong>Téléphone :</strong> ${phone}</li>
           <li><strong>Email :</strong> ${email || 'Non fourni'}</li>
           <li><strong>Message / Heure de passage :</strong> ${message || 'Non fourni'}</li>
         </ul>
@@ -76,7 +77,7 @@ const createPharmacistEmail = (details) => {
  * Crée le corps HTML de l'e-mail pour le CLIENT (Simplifié)
  */
 const createClientEmail = (details) => {
-    const { name, items, total } = details;
+    const { name, phone, email, items, total } = details; // MODIFICATION : Ajout de phone et email
 
     return `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -84,10 +85,18 @@ const createClientEmail = (details) => {
         <p>Bonjour ${name},</p>
         <p>Nous avons bien reçu votre demande de réservation à la <strong>Pharmacie Nord Montargis</strong>. Votre commande sera préparée par notre équipe.</p>
         
+        <div style="background-color: #f0fdfa; padding: 15px; border-left: 4px solid #0d9488; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #0d9488;">Vos coordonnées</h3>
+            <p style="margin: 5px 0;"><strong>Nom :</strong> ${name}</p>
+            <p style="margin: 5px 0;"><strong>Téléphone :</strong> ${phone}</p>
+            <p style="margin: 5px 0;"><strong>E-mail :</strong> ${email}</p>
+        </div>
+
         <div style="background-color: #f4f7f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Mentions importantes</h3>
             <p style="margin: 5px 0;">- Vous réglerez vos achats <strong>sur place</strong> lors du retrait.</p>
             <p style="margin: 5px 0;">- Une facture vous sera remise à ce moment-là.</p>
+            <p style="margin: 5px 0;">- Nous vous contacterons par téléphone si besoin.</p>
         </div>
 
         <h3>Votre récapitulatif :</h3>
@@ -117,11 +126,12 @@ router.post('/send-reservation', async (req, res) => {
     console.log('[INFO] Requête de réservation de panier reçue...');
     
     try {
-        const { name, email, message, sendConfirmation, items, total } = req.body;
+        const { name, phone, email, message, sendConfirmation, items, total } = req.body; // MODIFICATION : Ajout de phone
 
-        if (!name || !items || items.length === 0 || !total) {
+        // MODIFICATION : Validation incluant phone et email obligatoires
+        if (!name || !phone || !email || !items || items.length === 0 || !total) {
             console.warn('[WARN] Requête de réservation invalide, données manquantes.');
-            return res.status(400).json({ message: 'Données de réservation manquantes.' });
+            return res.status(400).json({ message: 'Données de réservation manquantes (nom, téléphone, email, items ou total).' });
         }
         
         const pharmacistEmailData = {
@@ -138,24 +148,24 @@ router.post('/send-reservation', async (req, res) => {
         );
         console.log('[SUCCESS] Réservation envoyée au pharmacien:', pharmacistResponse.id);
 
-        if (sendConfirmation && email) {
-            const clientEmailData = {
-                from: process.env.FROM_EMAIL,
-                to: [email],
-                subject: `Confirmation de votre réservation (Pharmacie Nord Montargis)`,
-                html: createClientEmail(req.body),
-            };
+        // MODIFICATION : Email de confirmation TOUJOURS envoyé (suppression de la condition if)
+        const clientEmailData = {
+            from: process.env.FROM_EMAIL,
+            to: [email],
+            subject: `Confirmation de votre réservation (Pharmacie Nord Montargis)`,
+            html: createClientEmail(req.body),
+        };
 
-            try {
-                console.log(`[INFO] Envoi de la confirmation client à ${email}...`);
-                const clientResponse = await mg.messages.create(
-                    process.env.MAILGUN_DOMAIN, 
-                    clientEmailData
-                );
-                console.log('[SUCCESS] Confirmation envoyée au client:', clientResponse.id);
-            } catch (clientError) {
-                console.error("[ERREUR] Échec de l'envoi de la confirmation client:", clientError);
-            }
+        try {
+            console.log(`[INFO] Envoi de la confirmation client à ${email}...`);
+            const clientResponse = await mg.messages.create(
+                process.env.MAILGUN_DOMAIN, 
+                clientEmailData
+            );
+            console.log('[SUCCESS] Confirmation envoyée au client:', clientResponse.id);
+        } catch (clientError) {
+            console.error("[ERREUR] Échec de l'envoi de la confirmation client:", clientError);
+            // On ne bloque pas la réponse même si l'email client échoue
         }
 
         res.status(200).json({ message: 'Réservation envoyée avec succès !' });

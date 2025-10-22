@@ -141,21 +141,37 @@
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fichier
                                 *</label>
                             <input type="file" id="prescriptionFile" name="prescriptionFile" required
-                                accept="image/*,.pdf" class="w-full text-sm text-gray-500 dark:text-gray-400
-                                          file:mr-4 file:py-2 file:px-4
-                                          file:rounded-lg file:border-0
-                                          file:text-sm file:font-semibold
-                                          file:bg-teal-50 dark:file:bg-teal-900
-                                          file:text-teal-700 dark:file:text-teal-300
-                                          hover:file:bg-teal-100 dark:hover:file:bg-teal-800
-                                          border border-gray-300 dark:border-gray-600 rounded-lg p-3
-                                          cursor-pointer">
-                            <small class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formats acceptés : PDF, PNG,
-                                JPG, HEIC (Max 10MB)</small>
+                                accept=".pdf,application/pdf" class="w-full text-sm text-gray-500 dark:text-gray-400
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-lg file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-teal-50 dark:file:bg-teal-900
+                  file:text-teal-700 dark:file:text-teal-300
+                  hover:file:bg-teal-100 dark:hover:file:bg-teal-800
+                  border border-gray-300 dark:border-gray-600 rounded-lg p-3
+                  cursor-pointer">
+                            <small class="text-xs text-gray-500 dark:text-gray-400 mt-1">Format accepté : PDF uniquement
+                                (Max 10MB)</small>
                         </div>
                     </div>
                 </div>
-
+                <div class="mt-6 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-4 rounded-r-lg">
+                    <div class="flex items-start">
+                        <span
+                            class="material-symbols-outlined text-amber-600 dark:text-amber-400 mr-3 text-2xl">info</span>
+                        <div class="text-sm text-amber-800 dark:text-amber-200">
+                            <p class="font-semibold mb-2">⚠️ Information importante</p>
+                            <p class="mb-2">
+                                L'ordonnance originale doit obligatoirement être présentée lors de votre passage en
+                                pharmacie.
+                            </p>
+                            <p class="text-xs">
+                                Les médicaments stupéfiants ou assimilés nécessitent une ordonnance sécurisée papier
+                                conforme à la réglementation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
                     <button type="submit" id="submit-btn"
                         class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg hover-lift">
@@ -163,12 +179,15 @@
                         <span>Envoyer mon ordonnance</span>
                     </button>
                     <br>
-                    <p> Aucune ordonnance ni information personnelle n’est enregistrée sur le serveur du site.
-                        Votre fichier est transmis directement et de manière chiffrée à l’adresse e-mail sécurisée de la
-                        Pharmacie Nord Montargis.
-                        Vous pouvez demander la suppression de vos données à tout moment en contactant directement la
-                        Pharmacie Nord Montargis. </p>
-                </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 text-center mt-3">
+                        Votre envoi est sécurisé et aucune donnée n'est sauvegardée sur nos serveurs.
+                    </p>
+                    <p class="text-center mt-2">
+                        <a href="politique-confidentialite.html"
+                            class="text-teal-600 dark:text-teal-400 font-semibold hover:text-teal-700 dark:hover:text-teal-300 hover:brightness-110 transition-all duration-300 underline underline-offset-4">
+                            Politique de confidentialité
+                        </a>
+                    </p>
             </form>
 
             <div id="status-message" class="mt-6"></div>
@@ -231,7 +250,7 @@
                 <span id="cartTotal" class="text-2xl font-bold text-teal-600 dark:text-teal-400">0,00 €</span>
             </div>
             <a href="validation.html" id="validateCart"
-                class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition text-center">
+                class="block w-full bg-teal-600 hover:bg-teal-700 text-white py-4 rounded-xl font-bold transition text-center text-lg shadow-lg hover:shadow-xl hover:scale-[1.02]">
                 Valider la réservation
             </a>
         </div>

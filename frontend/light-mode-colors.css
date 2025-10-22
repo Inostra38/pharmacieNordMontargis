@@ -89,7 +89,7 @@ html.dark .lot-inline {
 
 /* ==========================================
    CARTES PRODUITS
-   ========================================== */
+   ==========================================*/
 
 /* Amélioration des cartes en mode clair */
 html:not(.dark) .bg-white {

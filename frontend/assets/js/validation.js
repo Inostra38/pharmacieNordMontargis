@@ -42,9 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checkoutForm) {
             checkoutForm.addEventListener('submit', handleFormSubmit);
         }
-        if (confirmationCheckbox) {
-            confirmationCheckbox.addEventListener('change', toggleEmailRequirement);
-        }
+        // MODIFICATION : Suppression du listener checkbox car la checkbox n'existe plus
     }
 
     if (window.cartManager) {
@@ -140,11 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // console.log('DEBUG validation.js - Affichage du total final mis à jour.');
     }
 
-    function toggleEmailRequirement() {
-        if (!emailInput || !confirmationCheckbox) return;
-        emailInput.required = confirmationCheckbox.checked;
-        emailInput.placeholder = confirmationCheckbox.checked ? "E-mail (obligatoire pour la confirmation)" : "Pour recevoir la confirmation";
-    }
+    // MODIFICATION : Fonction toggleEmailRequirement() supprimée car la checkbox n'existe plus
 
     async function handleFormSubmit(event) {
         event.preventDefault();
@@ -158,15 +152,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(checkoutForm);
             const dataToSend = {
                 name: formData.get('name'),
+                phone: formData.get('phone'),          // MODIFICATION : Ajout du téléphone
                 email: formData.get('email'),
                 message: formData.get('message'),
-                sendConfirmation: formData.get('sendConfirmation') === 'on',
+                sendConfirmation: true,                // MODIFICATION : Toujours true maintenant
                 items: cartItems,
                 total: cartTotal
             };
 
+            // MODIFICATION : Ajout validation téléphone + modification validation email
             if (!dataToSend.name) throw new Error("Le nom complet est requis.");
-            if (dataToSend.sendConfirmation && !dataToSend.email) throw new Error("L'adresse e-mail est requise pour recevoir une confirmation.");
+            if (!dataToSend.phone) throw new Error("Le numéro de téléphone est requis.");
+            if (!dataToSend.email) throw new Error("L'adresse e-mail est requise.");
 
             const response = await fetch(API_ENDPOINT, {
                 method: 'POST',

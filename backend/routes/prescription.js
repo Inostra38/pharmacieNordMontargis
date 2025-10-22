@@ -45,17 +45,25 @@ router.post(
         return res.status(400).json({ message: 'Aucun fichier reçu.' });
       }
 
-      // 2. Récupérer les données du formulaire
-      const { name, email, phone } = req.body;
-      console.log(`[INFO] Fichier reçu de : ${name} (${email})`);
-      console.log(`[INFO] Fichier: ${req.file.originalname} (${Math.round(req.file.size / 1024)} Ko)`);
+      // 2. Validation du type de fichier (PDF uniquement)
+const allowedMimeTypes = ['application/pdf'];
+if (!allowedMimeTypes.includes(req.file.mimetype)) {
+  console.warn(`[WARN] Type de fichier non autorisé : ${req.file.mimetype}`);
+  return res.status(400).json({ 
+    message: 'Format de fichier non autorisé. Veuillez envoyer un fichier PDF uniquement.' 
+  });
+}
 
-      // 3. Préparation du fichier pour Mailgun
-      // req.file.buffer contient le fichier binaire en RAM
-      const attachment = {
-        filename: req.file.originalname,
-        data: req.file.buffer,
-      };
+// 3. Validation de l'extension du fichier (sécurité supplémentaire)
+const fileExtension = req.file.originalname.split('.').pop().toLowerCase();
+if (fileExtension !== 'pdf') {
+  console.warn(`[WARN] Extension de fichier non autorisée : ${fileExtension}`);
+  return res.status(400).json({ 
+    message: 'Extension de fichier non autorisée. Veuillez envoyer un fichier PDF (.pdf).' 
+  });
+}
+
+console.log('[INFO] Validation du fichier PDF réussie.');
 
       // 4. Préparation des données de l'e-mail
       // On utilise les variables de .env et les données du formulaire
