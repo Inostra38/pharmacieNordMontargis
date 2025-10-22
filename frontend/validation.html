@@ -5,11 +5,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Valider ma Réservation | Pharmacie Nord Montargis</title>
-    
+
+    <!--Favicon-->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.css"
+        media="print" onload="this.media='all'" />
+    <script defer src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.umd.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="light-mode-colors.css">
     <script>
@@ -46,14 +56,17 @@
     </nav>
     <section class="relative gradient-animation text-white py-12 md:py-16 transition-colors-slow">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-             <h1 class="text-3xl sm:text-4xl md:text-5xl font-title font-bold mb-3">Valider votre Réservation</h1>
-             <p class="text-base sm:text-lg md:text-xl font-body opacity-90 max-w-2xl mx-auto">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-title font-bold mb-3">Valider votre Réservation</h1>
+            <p class="text-base sm:text-lg md:text-xl font-body opacity-90 max-w-2xl mx-auto">
                 Vérifiez vos produits et finalisez votre demande de retrait.
             </p>
         </div>
         <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180" aria-hidden="true">
-            <svg class="relative block w-[200%] h-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M0,0V5.63C63.84,27.19,139.33,48.57,218,45.26c63.28-2.74,120.9-27.37,184-36.94,58.23-8.75,114.22,12.29,172.4,19.24,31.15,3.7,61.63,1.33,92.24-2.6,54.3-6.83,104.88-27.35,159.3-28.49,47.28-.99,92.78,16.26,137.34,33.32,66.92,26.28,131.9,36.27,197.72,27.84V0Z" fill="#ffffff"></path>
+            <svg class="relative block w-[200%] h-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
+                preserveAspectRatio="none">
+                <path
+                    d="M0,0V5.63C63.84,27.19,139.33,48.57,218,45.26c63.28-2.74,120.9-27.37,184-36.94,58.23-8.75,114.22,12.29,172.4,19.24,31.15,3.7,61.63,1.33,92.24-2.6,54.3-6.83,104.88-27.35,159.3-28.49,47.28-.99,92.78,16.26,137.34,33.32,66.92,26.28,131.9,36.27,197.72,27.84V0Z"
+                    fill="#ffffff"></path>
             </svg>
         </div>
     </section>
@@ -62,21 +75,23 @@
 
         <div id="validation-container">
             <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg transition-colors-slow">
-                
+
                 <h2 class="text-2xl font-title text-teal-700 dark:text-teal-300 mb-4">1. Votre Réservation</h2>
                 <div id="cart-summary-list" class="mb-4 divide-y divide-gray-100 dark:divide-gray-700">
                     <div class="text-center py-4 text-gray-500 dark:text-gray-400">Chargement du panier...</div>
                 </div>
-                
+
                 <div class="text-right border-t border-gray-200 dark:border-gray-700 pt-4">
                     <span class="text-lg font-semibold">Total estimé :</span>
-                    <span id="cart-summary-total" class="text-2xl font-bold text-teal-600 dark:text-teal-400">0,00 €</span>
+                    <span id="cart-summary-total" class="text-2xl font-bold text-teal-600 dark:text-teal-400">0,00
+                        €</span>
                 </div>
-                
+
                 <form id="checkout-form" class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
                     <h2 class="text-2xl font-title text-teal-700 dark:text-teal-300 mb-4">2. Vos Informations</h2>
-                    
-                    <div class="p-4 mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 space-y-1">
+
+                    <div
+                        class="p-4 mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 space-y-1">
                         <p>✓ Ceci est une <strong>réservation</strong> uniquement.</p>
                         <p>✓ Vous réglerez vos achats <strong>sur place</strong> lors du retrait.</p>
                         <p>✓ Une facture vous sera remise à ce moment-là.</p>
@@ -84,26 +99,32 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom complet *</label>
+                            <label for="name"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom complet
+                                *</label>
                             <input type="text" id="name" name="name" placeholder="Ex: Jean Dupont" required
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
-                        </div>
-                        
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>
-                            <input type="email" id="email" name="email" placeholder="Pour recevoir la confirmation"
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
                         </div>
 
                         <div>
-                            <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Heure de passage / Message (Optionnel)</label>
-                            <textarea id="message" name="message" rows="3" placeholder="Ex: Je passerai demain vers 17h."
-                                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition"></textarea>
+                            <label for="email"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>
+                            <input type="email" id="email" name="email" placeholder="Pour recevoir la confirmation"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
                         </div>
-                        
+
+                        <div>
+                            <label for="message"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Heure de passage
+                                / Message (Optionnel)</label>
+                            <textarea id="message" name="message" rows="3"
+                                placeholder="Ex: Je passerai demain vers 17h."
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition"></textarea>
+                        </div>
+
                         <div class="flex items-center">
                             <input type="checkbox" id="sendConfirmation" name="sendConfirmation"
-                                   class="h-4 w-4 text-teal-600 border-gray-300 dark:border-gray-600 rounded focus:ring-teal-500">
+                                class="h-4 w-4 text-teal-600 border-gray-300 dark:border-gray-600 rounded focus:ring-teal-500">
                             <label for="sendConfirmation" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                                 Je souhaite recevoir un e-mail de confirmation
                             </label>
@@ -112,7 +133,7 @@
 
                     <div class="mt-8">
                         <button type="submit" id="submit-btn"
-                                class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg hover-lift">
+                            class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg hover-lift">
                             <span class="material-symbols-outlined" aria-hidden="true">lock</span>
                             <span>Confirmer ma réservation</span>
                         </button>
@@ -123,23 +144,87 @@
 
             </div>
         </div>
-        
+
         <div id="success-container" class="hidden">
             <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg transition-colors-slow text-center">
                 <span class="text-6xl">🎉</span>
-                <h2 class="text-2xl font-title text-green-700 dark:text-green-300 mt-4 mb-2">Réservation confirmée !</h2>
+                <h2 class="text-2xl font-title text-green-700 dark:text-green-300 mt-4 mb-2">Réservation confirmée !
+                </h2>
                 <p class="text-gray-700 dark:text-gray-300 mb-6">
                     Votre demande a bien été transmise à la pharmacie. Nous allons la préparer.
                 </p>
                 <a href="index.html"
-                   class="inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition-all duration-300">
+                    class="inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition-all duration-300">
                     Retourner à l'accueil
                 </a>
             </div>
         </div>
 
+ <!-- Footer -->
+    <footer
+        class="bg-gradient-to-r from-teal-700 to-teal-800 dark:from-teal-900 dark:to-teal-950 text-white py-8 transition-colors-slow"
+        role="contentinfo">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <!-- Informations principales -->
+                <div>
+                    <h3 class="font-title text-lg mb-4 flex items-center justify-center md:justify-start">
+                        <span class="text-2xl mr-2" aria-hidden="true">💊</span>Pharmacie Nord Montargis
+                    </h3>
+                    <p class="text-teal-100 text-sm leading-relaxed">
+                        Votre pharmacie de confiance au cœur du bassin Montargois. Votre santé, votre bien-être.
+                    </p>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-title text-lg mb-4">Contact</h4>
+                    <div class="space-y-2 text-teal-100 text-sm">
+                        <p class="flex items-center justify-center md:justify-start">
+                            <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
+                                aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            <span>17 Avenue du Général Leclerc, 45120 Châlette-sur-Loing</span>
+                        </p>
+                        <p class="flex items-center justify-center md:justify-start">
+                            <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
+                                aria-hidden="true">
+                                <path
+                                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z">
+                                </path>
+                            </svg>
+                            <a href="tel:+33238852281" class="hover:text-white transition-colors">02 38 85 22 81</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Horaires -->
+                <div>
+                    <h4 class="font-title text-lg mb-4">Horaires</h4>
+                    <div class="text-teal-100 text-sm space-y-1">
+                        <p><strong>Lun - Ven :</strong> 9h00 - 13h00 • 14h00 - 19h00</p>
+                        <p><strong>Samedi :</strong> 10h00 - 17h00</p>
+                        <p><strong>Dimanche :</strong> Fermé</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-teal-600 mt-8 pt-6 text-center">
+            <p class="text-teal-100 text-sm">
+                © 2025 Pharmacie Nord Montargis. Tous droits réservés. |
+                <a href="mentions-legales.html" class="hover:text-white transition-colors">Mentions légales</a> |
+                <a href="politique-confidentialite.html" class="font-semibold hover:text-white transition-colors">Politique de confidentialité</a>
+            </p>
+        </div>
+        </div>
+    </footer>
+
     </main>
-    <footer class="bg-gradient-to-r from-teal-700 to-teal-800 dark:from-teal-900 dark:to-teal-950 text-white py-8 transition-colors-slow mt-12">
+    <footer
+        class="bg-gradient-to-r from-teal-700 to-teal-800 dark:from-teal-900 dark:to-teal-950 text-white py-8 transition-colors-slow mt-12">
         <div class="max-w-6xl mx-auto px-4 text-center">
             <p class="text-teal-100 text-sm">
                 © 2025 Pharmacie Nord Montargis. Tous droits réservés.
@@ -150,6 +235,8 @@
     <script src="assets/js/cart-v2.js"></script>
     <script src="assets/js/script.js" defer></script>
     <script src="assets/js/validation.js"></script>
-    
+    <script src="assets/js/cookie-config.js"></script>
+
 </body>
+
 </html>

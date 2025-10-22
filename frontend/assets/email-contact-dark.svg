@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="20" viewBox="0 0 280 20">
+  <style>
+    .email-text {
+      font-family: 'Open Sans', Arial, sans-serif;
+      font-size: 14px;
+      fill: #e5e7eb; /* Couleur texte claire (gray-200) */
+      font-weight: 600; /* Semi-gras */
+      dominant-baseline: middle;
+    }
+  </style>
+  <text x="0" y="5" class="email-text">contact@pharmacienordmontargis.fr</text>
+</svg>

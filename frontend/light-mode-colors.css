@@ -188,3 +188,21 @@ html.dark .skeleton {
     0% { background-position: 100% 0; }
     100% { background-position: 0 0; }
 }
+
+/* ==========================================
+   STYLES PROSE - Mode Clair
+   ========================================== */
+
+/* Couleur des titres H2 dans les articles 'prose' en mode clair */
+html:not(.dark) .prose h2 {
+  color: #0f766e; /* Correspond à text-teal-700 */
+}
+
+/* ==========================================
+   STYLES PROSE - Mode Clair (Suite)
+   ========================================== */
+
+/* Couleur des textes en gras (strong) dans 'prose' en mode clair */
+html:not(.dark) .prose strong {
+  color: #0f766e; /* Correspond à text-teal-700 */
+}

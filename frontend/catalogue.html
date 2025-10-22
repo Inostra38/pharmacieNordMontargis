@@ -15,6 +15,13 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Luckiest+Guy&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.css"
+        media="print" onload="this.media='all'" />
+    <script defer src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.umd.js"></script>
+
+    <!--Favicon-->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -172,23 +179,12 @@
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                        <span class="material-symbols-outlined text-sm align-middle">category</span>
-                        Catégorie
-                    </label>
-                    <select id="categoryFilter"
-                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
-                        <option value="">Toutes les catégories</option>
-                    </select>
-                </div>
-
                 <div class="flex items-center">
                     <label class="flex items-center space-x-2 cursor-pointer mt-6">
                         <input type="checkbox" id="stockFilter"
                             class="w-5 h-5 text-teal-600 rounded focus:ring-2 focus:ring-teal-500">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            ✅ En stock uniquement
+                        En stock uniquement
                         </span>
                     </label>
                 </div>
@@ -249,7 +245,67 @@
             <p class="mt-4 text-gray-600 dark:text-gray-400">Chargement des produits...</p>
         </div>
     </main>
+ <!-- Footer -->
+    <footer
+        class="bg-gradient-to-r from-teal-700 to-teal-800 dark:from-teal-900 dark:to-teal-950 text-white py-8 transition-colors-slow"
+        role="contentinfo">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <!-- Informations principales -->
+                <div>
+                    <h3 class="font-title text-lg mb-4 flex items-center justify-center md:justify-start">
+                        <span class="text-2xl mr-2" aria-hidden="true">💊</span>Pharmacie Nord Montargis
+                    </h3>
+                    <p class="text-teal-100 text-sm leading-relaxed">
+                        Votre pharmacie de confiance au cœur du bassin Montargois. Votre santé, votre bien-être.
+                    </p>
+                </div>
 
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-title text-lg mb-4">Contact</h4>
+                    <div class="space-y-2 text-teal-100 text-sm">
+                        <p class="flex items-center justify-center md:justify-start">
+                            <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
+                                aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            <span>17 Avenue du Général Leclerc, 45120 Châlette-sur-Loing</span>
+                        </p>
+                        <p class="flex items-center justify-center md:justify-start">
+                            <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
+                                aria-hidden="true">
+                                <path
+                                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z">
+                                </path>
+                            </svg>
+                            <a href="tel:+33238852281" class="hover:text-white transition-colors">02 38 85 22 81</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Horaires -->
+                <div>
+                    <h4 class="font-title text-lg mb-4">Horaires</h4>
+                    <div class="text-teal-100 text-sm space-y-1">
+                        <p><strong>Lun - Ven :</strong> 9h00 - 13h00 • 14h00 - 19h00</p>
+                        <p><strong>Samedi :</strong> 10h00 - 17h00</p>
+                        <p><strong>Dimanche :</strong> Fermé</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-teal-600 mt-8 pt-6 text-center">
+            <p class="text-teal-100 text-sm">
+                © 2025 Pharmacie Nord Montargis. Tous droits réservés. |
+                <a href="mentions-legales.html" class="hover:text-white transition-colors">Mentions légales</a> |
+                <a href="politique-confidentialite.html" class="font-semibold hover:text-white transition-colors">Politique de confidentialité</a>
+            </p>
+        </div>
+        </div>
+    </footer>
     <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
 
     <div id="cartDrawer"
@@ -280,6 +336,7 @@
     <script src="assets/js/cache-manager.js"></script>
     <script src="assets/js/cart-v2.js"></script>
     <script src="assets/js/catalogue.js"></script>
+    <script src="assets/js/cookie-config.js"></script>
 </body>
 
 </html>
