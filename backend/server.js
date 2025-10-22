@@ -12,11 +12,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --- 1. Routes API ---
-// Les routes API doivent TOUJOURS être déclarées AVANT le serveur statique
 const prescriptionRoutes = require('./routes/prescription');
 app.use('/api/prescription', prescriptionRoutes);
 
-// (Futur) app.use('/api/cart', cartRoutes);
+// NOUVEAU : Ajouter la route pour le panier
+const cartRoutes = require('./routes/cart');
+app.use('/api/cart', cartRoutes);
 
 
 // --- 2. Serveur de Fichiers Frontend ---

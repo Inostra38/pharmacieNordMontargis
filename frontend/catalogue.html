@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" class="dark">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,8 +8,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Luckiest+Guy&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -39,15 +43,15 @@
             padding: .1rem .5rem;
             border-radius: .5rem;
             display: inline-block;
-            text-shadow: 0 1px 0 rgba(0,0,0,.08);
+            text-shadow: 0 1px 0 rgba(0, 0, 0, .08);
         }
-        
+
         .price-old {
             font-size: .875rem;
             color: #94a3b8;
             text-decoration: line-through;
         }
-        
+
         .lot-inline {
             display: inline-flex;
             align-items: baseline;
@@ -62,12 +66,19 @@
             background-size: 400% 100%;
             animation: shimmer 1.4s ease infinite;
         }
+
         .dark .skeleton {
             background: linear-gradient(90deg, #1e293b 25%, #334155 37%, #1e293b 63%);
         }
+
         @keyframes shimmer {
-            0% { background-position: 100% 0 }
-            100% { background-position: 0 0 }
+            0% {
+                background-position: 100% 0
+            }
+
+            100% {
+                background-position: 0 0
+            }
         }
     </style>
 </head>
@@ -77,22 +88,26 @@
     <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors-slow">
         <div class="max-w-6xl mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
-                <a href="index.html" class="text-xl font-title font-bold text-teal-700 dark:text-teal-300 hover:text-teal-600 transition">
+                <a href="index.html"
+                    class="text-xl font-title font-bold text-teal-700 dark:text-teal-300 hover:text-teal-600 transition">
                     Pharmacie Nord Montargis
                 </a>
 
                 <div class="flex items-center space-x-4">
-                    <a href="index.html" class="text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition">
+                    <a href="index.html"
+                        class="text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition">
                         Accueil
                     </a>
-                    
-                    <button id="cartButton" class="relative text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition">
+
+                    <button id="cartButton"
+                        class="relative text-gray-600 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition">
                         <span class="material-symbols-outlined text-3xl">shopping_cart</span>
-                        <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">
+                        <span id="cartBadge"
+                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">
                             0
                         </span>
                     </button>
-                    
+
                     <button id="darkToggle"
                         class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-3 py-1 rounded-full shadow font-bold flex items-center justify-center w-10 h-10 hover:scale-105 transition-transform">
                         <span id="darkIcon" class="text-xl">🌙</span>
@@ -111,10 +126,17 @@
         </div>
 
         <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180">
-            <svg class="relative block w-[200%] h-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M0,0V46.29c47.79,22,103.79,29.05,158,17.58C230.91,50.53,284,7.62,339.65,1.43c71.73-8.4,136.76,39.3,207.7,35.36,62.9-3.52,113.45-45.19,172.29-56.69,59.63-11.7,117.24,17.47,173.62,35.21,43.84,13.63,87.55,16.78,131.45,5.43V0Z" opacity=".1" fill="#ffffff"></path>
-                <path d="M0,0V15.81C47.42,35.75,103.63,48.13,158,43.91c65.84-5.38,113.21-35.27,177.69-39.45,59.15-3.87,113.28,23.64,168.49,38.41,30.75,8.18,62.09,6.26,93.4-2.57,50.13-14.23,98.18-40.91,150.21-44.68,46.74-3.33,92.11,15.68,137.2,30.34,47.41,15.36,94.62,25.33,143.02,27.29V0Z" opacity=".3" fill="#ffffff"></path>
-                <path d="M0,0V5.63C63.84,27.19,139.33,48.57,218,45.26c63.28-2.74,120.9-27.37,184-36.94,58.23-8.75,114.22,12.29,172.4,19.24,31.15,3.7,61.63,1.33,92.24-2.6,54.3-6.83,104.88-27.35,159.3-28.49,47.28-.99,92.78,16.26,137.34,33.32,66.92,26.28,131.9,36.27,197.72,27.84V0Z" fill="#ffffff"></path>
+            <svg class="relative block w-[200%] h-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
+                preserveAspectRatio="none">
+                <path
+                    d="M0,0V46.29c47.79,22,103.79,29.05,158,17.58C230.91,50.53,284,7.62,339.65,1.43c71.73-8.4,136.76,39.3,207.7,35.36,62.9-3.52,113.45-45.19,172.29-56.69,59.63-11.7,117.24,17.47,173.62,35.21,43.84,13.63,87.55,16.78,131.45,5.43V0Z"
+                    opacity=".1" fill="#ffffff"></path>
+                <path
+                    d="M0,0V15.81C47.42,35.75,103.63,48.13,158,43.91c65.84-5.38,113.21-35.27,177.69-39.45,59.15-3.87,113.28,23.64,168.49,38.41,30.75,8.18,62.09,6.26,93.4-2.57,50.13-14.23,98.18-40.91,150.21-44.68,46.74-3.33,92.11,15.68,137.2,30.34,47.41,15.36,94.62,25.33,143.02,27.29V0Z"
+                    opacity=".3" fill="#ffffff"></path>
+                <path
+                    d="M0,0V5.63C63.84,27.19,139.33,48.57,218,45.26c63.28-2.74,120.9-27.37,184-36.94,58.23-8.75,114.22,12.29,172.4,19.24,31.15,3.7,61.63,1.33,92.24-2.6,54.3-6.83,104.88-27.35,159.3-28.49,47.28-.99,92.78,16.26,137.34,33.32,66.92,26.28,131.9,36.27,197.72,27.84V0Z"
+                    fill="#ffffff"></path>
             </svg>
         </div>
     </section>
@@ -122,16 +144,13 @@
     <main class="max-w-6xl mx-auto px-4 py-8">
 
         <section class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 transition-colors-slow">
-            
+
             <div class="mb-6">
                 <div class="relative">
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="🔍 Rechercher par nom, CIP ou laboratoire..."
-                        class="w-full px-4 py-4 pl-12 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-white transition text-lg"
-                    >
-                    <span class="material-symbols-outlined absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-2xl">
+                    <input type="text" id="searchInput" placeholder="🔍 Rechercher par nom, CIP ou laboratoire..."
+                        class="w-full px-4 py-4 pl-12 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-white transition text-lg">
+                    <span
+                        class="material-symbols-outlined absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-2xl">
                         search
                     </span>
                 </div>
@@ -141,15 +160,16 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                
+
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                         <span class="material-symbols-outlined text-sm align-middle">science</span>
                         Laboratoire
                     </label>
-                    <select id="labFilter" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
+                    <select id="labFilter"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
                         <option value="">Tous les laboratoires</option>
-                        </select>
+                    </select>
                 </div>
 
                 <div>
@@ -157,18 +177,16 @@
                         <span class="material-symbols-outlined text-sm align-middle">category</span>
                         Catégorie
                     </label>
-                    <select id="categoryFilter" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
+                    <select id="categoryFilter"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
                         <option value="">Toutes les catégories</option>
-                        </select>
+                    </select>
                 </div>
 
                 <div class="flex items-center">
                     <label class="flex items-center space-x-2 cursor-pointer mt-6">
-                        <input
-                            type="checkbox"
-                            id="stockFilter"
-                            class="w-5 h-5 text-teal-600 rounded focus:ring-2 focus:ring-teal-500"
-                        >
+                        <input type="checkbox" id="stockFilter"
+                            class="w-5 h-5 text-teal-600 rounded focus:ring-2 focus:ring-teal-500">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
                             ✅ En stock uniquement
                         </span>
@@ -176,10 +194,8 @@
                 </div>
 
                 <div class="flex items-end">
-                    <button
-                        id="resetFiltersBtn"
-                        class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-3 rounded-lg transition flex items-center justify-center gap-2 font-medium"
-                    >
+                    <button id="resetFiltersBtn"
+                        class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-3 rounded-lg transition flex items-center justify-center gap-2 font-medium">
                         <span class="material-symbols-outlined">refresh</span>
                         Réinitialiser
                     </button>
@@ -193,40 +209,23 @@
                 </label>
                 <div class="flex flex-wrap gap-4">
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="displayMode"
-                            value="tous"
-                            checked
-                            class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500"
-                        >
+                        <input type="radio" name="displayMode" value="tous" checked
+                            class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Tous les produits</span>
                     </label>
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="displayMode"
-                            value="misEnAvant"
-                            class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500"
-                        >
+                        <input type="radio" name="displayMode" value="misEnAvant"
+                            class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500">
                         <span class="text-sm text-gray-700 dark:text-gray-300">⭐ Les + consultés</span>
                     </label>
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="displayMode"
-                            value="promotions"
-                            class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500"
-                        >
+                        <input type="radio" name="displayMode" value="promotions"
+                            class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500">
                         <span class="text-sm text-gray-700 dark:text-gray-300">🔥 Promotions</span>
                     </label>
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="displayMode"
-                            value="petitsPrix"
-                            class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500"
-                        >
+                        <input type="radio" name="displayMode" value="petitsPrix"
+                            class="w-4 h-4 text-teal-600 focus:ring-2 focus:ring-teal-500">
                         <span class="text-sm text-gray-700 dark:text-gray-300">💰 Petits prix</span>
                     </label>
                 </div>
@@ -242,39 +241,45 @@
         </div>
 
         <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            </div>
+        </div>
 
         <div id="loadingIndicator" class="text-center py-12 hidden">
-            <div class="inline-block w-12 h-12 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin"></div>
+            <div class="inline-block w-12 h-12 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin">
+            </div>
             <p class="mt-4 text-gray-600 dark:text-gray-400">Chargement des produits...</p>
         </div>
     </main>
 
     <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
 
-    <div id="cartDrawer" class="fixed top-0 left-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl transform -translate-x-full transition-transform duration-300 z-50 flex flex-col">
+    <div id="cartDrawer"
+        class="fixed top-0 left-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl transform -translate-x-full transition-transform duration-300 z-50 flex flex-col">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <h2 class="text-2xl font-title font-bold text-gray-800 dark:text-white">🛒 Mon Panier</h2>
-            <button id="closeCart" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-3xl leading-none">×</button>
+            <button id="closeCart"
+                class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-3xl leading-none">×</button>
         </div>
-        
+
         <div id="cartItems" class="flex-1 overflow-y-auto p-6">
             <p class="text-center text-gray-500 dark:text-gray-400 py-8">Votre panier est vide</p>
         </div>
-        
+
         <div class="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             <div class="flex justify-between items-center mb-4">
                 <span class="text-lg font-semibold">Total</span>
                 <span id="cartTotal" class="text-2xl font-bold text-teal-600 dark:text-teal-400">0,00 €</span>
             </div>
-            <button id="validateCart" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition">
+            <a href="validation.html" id="validateCart"
+                class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition text-center">
                 Valider la réservation
-            </button>
+            </a>
         </div>
     </div>
 
     <script src="assets/js/config.js"></script>
     <script src="assets/js/cache-manager.js"></script>
     <script src="assets/js/cart-v2.js"></script>
-    <script src="assets/js/catalogue.js"></script> </body>
+    <script src="assets/js/catalogue.js"></script>
+</body>
+
 </html>

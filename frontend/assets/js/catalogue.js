@@ -125,7 +125,7 @@ function renderProduct(item) {
 
     // Badges
     let badges = '';
-    if (item.ordonnance) {
+    if (item.ordonnance) { //
         badges += '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 dark:bg-rose-900 dark:text-rose-300">📋 Ordonnance</span>';
     }
 
@@ -155,6 +155,37 @@ function renderProduct(item) {
         priceHTML = `<div class="flex items-baseline gap-2"><span class="text-xl font-bold text-gray-800 dark:text-white">${formatPrice(item.prix)}</span>${lotHTML}</div>`;
     }
 
+    // --- NOUVELLE LOGIQUE POUR LE BOUTON ---
+    let buttonHtml = '';
+    if (item.ordonnance) {
+        // Si ordonnance requise, afficher un LIEN vers la page d'upload
+        buttonHtml = `
+            <a
+                href="secure.ordonnance.html"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+                title="Ce produit nécessite une ordonnance. Cliquez pour envoyer la vôtre."
+            >
+                <span class="material-symbols-outlined">upload_file</span>
+                Envoyer l'ordonnance
+            </a>
+        `;
+    } else {
+        // Sinon, afficher le bouton "Réserver" normal
+        buttonHtml = `
+            <button
+                class="reserve-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+                data-id="${item.id}"
+                data-name="${escapeHtml(item.libelle)}"
+                data-price="${item.prix_promo || item.prix}"
+                data-cip="${item.cip}"
+            >
+                <span class="material-symbols-outlined">shopping_cart</span>
+                Réserver
+            </button>
+        `;
+    }
+    // --- FIN DE LA NOUVELLE LOGIQUE ---
+
     return `
         <div class="product-card bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden">
             <div class="p-5">
@@ -179,20 +210,11 @@ function renderProduct(item) {
                     Stock : ${typeof item.stock === 'number' ? item.stock : '—'}
                 </p>
 
-                <button
-                    class="reserve-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
-                    data-id="${item.id}"
-                    data-name="${escapeHtml(item.libelle)}"
-                    data-price="${item.prix_promo || item.prix}"
-                    data-cip="${item.cip}"
-                >
-                    <span class="material-symbols-outlined">shopping_cart</span>
-                    Réserver
-                </button>
+                ${buttonHtml}
             </div>
         </div>
     `;
-}
+}   
 
 function renderGrid(items) {
     const grid = document.getElementById('productsGrid');

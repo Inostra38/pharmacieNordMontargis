@@ -235,33 +235,36 @@ class CartManager {
     }
 }
 
-// Initialiser le panier au chargement avec vérification
+// ... (TOUT le code de la classe CartManager reste identique) ...
+
+// ... (TOUT le code de la classe CartManager reste identique) ...
+
+// --- Initialisation du panier (AMÉLIORÉE ET PLUS TOLÉRANTE) ---
 if (typeof window !== 'undefined') {
-    // S'assurer que le DOM est prêt
-    function initCart() {
-        console.log('🔄 Tentative d\'initialisation du panier...');
+
+    // Attend que TOUT le HTML soit chargé ET parsé
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('✅ DOM entièrement chargé. Initialisation du panier...');
         
-        // Vérifier que les éléments existent
-        const cartBadge = document.getElementById('cartBadge');
-        const cartItems = document.getElementById('cartItems');
-        const cartTotal = document.getElementById('cartTotal');
-        
-        if (!cartBadge || !cartItems || !cartTotal) {
-            console.warn('⚠️ Éléments du panier non encore disponibles, nouvelle tentative dans 100ms...');
-            setTimeout(initCart, 100);
-            return;
+        // Vérifier si #cartBadge existe, MAIS ne pas bloquer si absent
+        const cartBadge = document.getElementById('cartBadge'); 
+        if (!cartBadge) {
+             console.warn('⚠️ Élément #cartBadge introuvable sur cette page. Le panier s\'initialisera sans mettre à jour le badge.');
+             // On ne met PAS de 'return' ici, on continue !
+        } else {
+            console.log('✅ Élément #cartBadge trouvé.');
         }
-        
-        console.log('✅ Éléments du panier trouvés, initialisation...');
+
+        // Créer l'instance du panier QUOI QU'IL ARRIVE
         window.cartManager = new CartManager();
         console.log('✅ window.cartManager créé et accessible');
-    }
-    
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initCart);
-    } else {
-        initCart();
-    }
-}
 
-console.log('✅ Cart-v2.js chargé');
+        // Déclencher l'événement pour dire "Le panier est prêt !"
+        document.dispatchEvent(new CustomEvent('cartManagerReady'));
+        console.log('🚀 Événement "cartManagerReady" déclenché.');
+
+    }); // Fin de DOMContentLoaded
+
+} // Fin de if (typeof window !== 'undefined')
+
+console.log('✅ Cart-v2.js chargé (avec initialisation améliorée et tolérante)');

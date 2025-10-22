@@ -193,8 +193,8 @@ class HomeProductsManager {
             badgesHtml += `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">🔥 ${this.escapeHtml(promoLabel)}</span>`;
         }
         
-        // Badge ordonnance
-        if (product.tableau) {
+        // Badge ordonnance (MODIFIÉ : on vérifie `product.tableau`)
+        if (product.tableau) { //
             badgesHtml += `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">📋 Ordonnance</span>`;
         }
         
@@ -212,14 +212,11 @@ class HomeProductsManager {
         
         // Déterminer le prix à afficher
         if (promoNorm === 'petits prix') {
-            // Petits Prix : afficher prix_promo ou prix avec style promo
             const val = typeof product.prix_promo === 'number' ? product.prix_promo : product.prix;
             priceHTML = `<div class="flex items-baseline gap-2"><span class="price-promo">${this.formatPrice(val)}</span>${lotHTML}</div>`;
         } else if (typeof product.prix_promo === 'number' && Number.isFinite(product.prix_promo)) {
-            // Promo classique : ancien prix barré + nouveau prix
             priceHTML = `<div class="flex items-baseline gap-2"><span class="price-old">${this.formatPrice(product.prix)}</span><span class="price-promo">${this.formatPrice(product.prix_promo)}</span>${lotHTML}</div>`;
         } else {
-            // Prix normal
             priceHTML = `<div class="flex items-baseline gap-2"><span class="text-xl font-bold text-gray-800 dark:text-white">${this.formatPrice(product.prix)}</span>${lotHTML}</div>`;
         }
         
@@ -233,43 +230,59 @@ class HomeProductsManager {
             availabilityHtml = '<span class="text-xs text-green-600 dark:text-green-400 font-medium">En stock</span>';
         }
 
+        // --- NOUVELLE LOGIQUE POUR LE BOUTON ---
+        let buttonHtml = '';
+        if (product.tableau) {
+            // Si ordonnance requise, afficher un bouton bleu "Sur ordonnance" désactivé
+            buttonHtml = `
+                <button 
+                    class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 cursor-not-allowed"
+                    disabled
+                    title="Ce produit nécessite une ordonnance et ne peut pas être réservé."
+                >
+                    <span class="material-symbols-outlined text-sm">assignment</span>
+                    Sur ordonnance
+                </button>
+            `;
+        } else {
+            // Sinon, afficher le bouton "Réserver" normal
+            buttonHtml = `
+                <button 
+                    class="reserve-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
+                    data-id="${product.id || product.identifiant}"
+                    data-name="${this.escapeHtml(product.libelle)}"
+                    data-price="${product.prix_promo || product.prix}"
+                    data-cip="${product.code_cip || product.cip}"
+                >
+                    <span class="material-symbols-outlined text-sm">shopping_cart</span>
+                    Réserver
+                </button>
+            `;
+        }
+        // --- FIN DE LA NOUVELLE LOGIQUE ---
+
         return `
             <article class="bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden relative group">
                 <div class="p-4">
-                    <!-- Badges -->
                     <div class="flex flex-wrap gap-2 mb-3">
                         ${badgesHtml}
                     </div>
                     
-                    <!-- Titre -->
                     <h3 class="font-semibold text-gray-800 dark:text-white mb-2 line-clamp-2 h-12 text-sm">${product.libelle}</h3>
                     
-                    <!-- Marque / Catégorie -->
                     <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
                         ${product.fournisseur || product.marque ? (product.fournisseur || product.marque) + ' • ' : ''}CIP ${product.code_cip || product.cip || '?'}
                     </p>
                     
-                    <!-- Prix -->
                     <div class="mb-3">
                         ${priceHTML}
                     </div>
                     
-                    <!-- Stock -->
                     <div class="flex items-center justify-between mb-3">
                         ${availabilityHtml}
                     </div>
                     
-                    <!-- Bouton Réserver -->
-                    <button 
-                        class="reserve-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
-                        data-id="${product.id || product.identifiant}"
-                        data-name="${this.escapeHtml(product.libelle)}"
-                        data-price="${product.prix_promo || product.prix}"
-                        data-cip="${product.code_cip || product.cip}"
-                    >
-                        <span class="material-symbols-outlined text-sm">shopping_cart</span>
-                        Réserver
-                    </button>
+                    ${buttonHtml}
                 </div>
             </article>
         `;
