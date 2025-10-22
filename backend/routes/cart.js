@@ -108,7 +108,7 @@ const createClientEmail = (details) => {
           `).join('')}
         </ul>
         <p style="font-size: 1.2em; font-weight: bold;">
-          Total estimé : ${formatPrice(total)}
+          Total à régler sur place : ${formatPrice(total)}
         </p>
         <hr>
         <p>Merci de votre confiance et à bientôt !</p>
