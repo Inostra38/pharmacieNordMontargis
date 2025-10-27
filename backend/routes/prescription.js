@@ -292,24 +292,27 @@ Traiter avec confidentialité conformément au RGPD.
 );
 
 // ============================================
-// 📍 ROUTE DE TEST (Optionnelle - à supprimer en production)
+// 📍 ROUTE DE TEST (Active uniquement en développement)
 // ============================================
 
-router.get('/test', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'Route prescription fonctionnelle',
-    endpoint: '/api/prescription/upload',
-    validation: 'active',
-    rateLimit: 'active (10 req/heure)',
-    envCheck: {
-      MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? '✅' : '❌',
-      MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN ? '✅' : '❌',
-      RECIPIENT_EMAIL: process.env.RECIPIENT_EMAIL ? '✅' : '❌'
-    },
-    timestamp: new Date().toISOString()
+if (process.env.NODE_ENV === 'development') {
+  router.get('/test', (req, res) => {
+    res.json({
+      status: 'ok',
+      message: 'Route prescription fonctionnelle',
+      endpoint: '/api/prescription/upload',
+      validation: 'active',
+      rateLimit: 'active (10 req/heure)',
+      envCheck: {
+        MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? '✅' : '❌',
+        MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN ? '✅' : '❌',
+        PHARMACIST_EMAIL: process.env.PHARMACIST_EMAIL ? '✅' : '❌'
+      },
+      environment: process.env.NODE_ENV,
+      timestamp: new Date().toISOString()
+    });
   });
-});
+}
 
 // ============================================
 // 📤 EXPORT
