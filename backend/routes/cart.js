@@ -17,57 +17,50 @@ const formatPrice = (price) => {
 };
 
 /**
- * Crée le corps HTML de l'e-mail pour le PHARMACIEN (Simplifié)
+ * Crée le corps HTML de l'e-mail pour le PHARMACIEN
+ * MODIFIÉ : Utilise maintenant 'cart' au lieu de 'items'
  */
 const createPharmacistEmail = (details) => {
-    const { name, phone, email, message, items, total } = details; // MODIFICATION : Ajout de phone
+    const { name, phone, email, message, cart, total } = details;
 
     return `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-        <h1>Nouvelle Réservation (Site Web)</h1>
-        <p>Vous avez reçu une nouvelle réservation de <strong>${name}</strong>.</p>
-        <hr>
-        <h2>Informations Client</h2>
+        <h1>🔔 Nouvelle Réservation de Panier</h1>
+        <p>Un client a réservé des produits sur le site web.</p>
+        
+        <div style="background-color: #f0fdfa; padding: 15px; border-left: 4px solid #0d9488; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #0d9488;">Coordonnées du client</h3>
+            <p style="margin: 5px 0;"><strong>Nom :</strong> ${name}</p>
+            <p style="margin: 5px 0;"><strong>Téléphone :</strong> ${phone}</p>
+            <p style="margin: 5px 0;"><strong>E-mail :</strong> ${email}</p>
+        </div>
+
+        <h3>Produits réservés :</h3>
         <ul>
-          <li><strong>Nom :</strong> ${name}</li>
-          <li><strong>Téléphone :</strong> ${phone}</li>
-          <li><strong>Email :</strong> ${email || 'Non fourni'}</li>
-          <li><strong>Message / Heure de passage :</strong> ${message || 'Non fourni'}</li>
+          ${cart.map(item => `
+            <li>
+              <strong>${item.name}</strong> (x${item.quantity}) 
+              ${item.cip ? `<br>CIP : ${item.cip}` : ''}
+              ${item.requiresPrescription ? '<span style="color: red;"> ⚠️ Ordonnance requise</span>' : ''}
+            </li>
+          `).join('')}
         </ul>
+        
+        <p style="font-size: 1.2em; font-weight: bold; color: #0d9488;">
+          Montant total : ${formatPrice(total)}
+        </p>
+
+        ${message ? `
+        <div style="background-color: #fffbeb; padding: 15px; border-left: 4px solid #f59e0b; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #f59e0b;">Message du client</h3>
+            <p style="margin: 0;">${message}</p>
+        </div>
+        ` : ''}
+
         <hr>
-        <h2>Détail de la réservation</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background-color: #f4f4f4;">
-              <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Produit</th>
-              <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Qté</th>
-              <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Prix Unitaire</th>
-              <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${items.map(item => `
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;">
-                  ${item.name}
-                  <br>
-                  <small style="color: #555;">CIP: ${item.cip}</small>
-                </td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${formatPrice(item.price)}</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${formatPrice(item.price * item.quantity)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-          <tfoot>
-            <tr style="background-color: #f4f4f4;">
-              <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold;">Total estimé</td>
-              <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold;">${formatPrice(total)}</td>
-            </tr>
-          </tfoot>
-        </table>
-        <p style="margin-top: 15px; font-style: italic; color: #888;">
-          Ceci est une réservation. Le paiement s'effectuera sur place.
+        <p style="color: #666;">
+          Cet e-mail provient du système de réservation en ligne de la Pharmacie Nord Montargis.<br>
+          Le paiement s'effectuera sur place.
         </p>
       </div>
     `;
@@ -75,9 +68,10 @@ const createPharmacistEmail = (details) => {
 
 /**
  * Crée le corps HTML de l'e-mail pour le CLIENT (Simplifié)
+ * MODIFIÉ : Utilise maintenant 'cart' au lieu de 'items'
  */
 const createClientEmail = (details) => {
-    const { name, phone, email, items, total } = details; // MODIFICATION : Ajout de phone et email
+    const { name, phone, email, cart, total } = details;
 
     return `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -101,7 +95,7 @@ const createClientEmail = (details) => {
 
         <h3>Votre récapitulatif :</h3>
         <ul>
-          ${items.map(item => `
+          ${cart.map(item => `
             <li>
               <strong>${item.name}</strong> (x${item.quantity})
             </li>
@@ -120,20 +114,23 @@ const createClientEmail = (details) => {
 
 /**
  * @route POST /api/cart/send-reservation
+ * MODIFIÉ : Utilise maintenant 'cart' au lieu de 'items'
  */
 router.post('/send-reservation', async (req, res) => {
     
     console.log('[INFO] Requête de réservation de panier reçue...');
     
     try {
-        const { name, phone, email, message, sendConfirmation, items, total } = req.body; // MODIFICATION : Ajout de phone
+        // ✅ MODIFICATION : 'items' remplacé par 'cart'
+        const { name, phone, email, message, sendConfirmation, cart, total } = req.body;
 
-        // MODIFICATION : Validation incluant phone et email obligatoires
-        if (!name || !phone || !email || !items || items.length === 0 || !total) {
+        // ✅ MODIFICATION : Validation avec 'cart' au lieu de 'items'
+        if (!name || !phone || !email || !cart || cart.length === 0 || !total) {
             console.warn('[WARN] Requête de réservation invalide, données manquantes.');
-            return res.status(400).json({ message: 'Données de réservation manquantes (nom, téléphone, email, items ou total).' });
+            return res.status(400).json({ message: 'Données de réservation manquantes (nom, téléphone, email, cart ou total).' });
         }
         
+        // Email pour le pharmacien
         const pharmacistEmailData = {
             from: process.env.FROM_EMAIL,
             to: [process.env.PHARMACIST_EMAIL],
@@ -148,7 +145,7 @@ router.post('/send-reservation', async (req, res) => {
         );
         console.log('[SUCCESS] Réservation envoyée au pharmacien:', pharmacistResponse.id);
 
-        // MODIFICATION : Email de confirmation TOUJOURS envoyé (suppression de la condition if)
+        // Email de confirmation au client (TOUJOURS envoyé)
         const clientEmailData = {
             from: process.env.FROM_EMAIL,
             to: [email],

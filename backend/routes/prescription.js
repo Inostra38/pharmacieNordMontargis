@@ -1,128 +1,180 @@
 const express = require('express');
-const multer = require('multer');
-// On utilise require, mais on respecte la casse 'FormData' que 'mailgun.js' v11 attend
-const FormData = require('form-data'); 
-const Mailgun = require('mailgun.js');
 const router = express.Router();
+const multer = require('multer');
+const FormData = require('form-data');
+const Mailgun = require('mailgun.js');
+const { validatePrescription, validateFileUpload } = require('../middleware/validation.middleware');
 
-// --- Configuration ---
-
-// 1. Configurer Mailgun avec la NOUVELLE SYNTAXE (v11)
+// ============================================
+// 📧 CONFIGURATION MAILGUN
+// ============================================
 const mailgun = new Mailgun(FormData);
 const mg = mailgun.client({
   username: 'api',
-  // Assurez-vous que MAILGUN_API_KEY est bien dans votre .env
-  key: process.env.MAILGUN_API_KEY, 
-  // On lit l'URL/région depuis .env (que j'avais nommé MAILGUN_API_HOST)
-  // Mettez "https://api.eu.mailgun.net" dans votre .env si vous êtes en EU
-  url: process.env.MAILGUN_API_HOST || 'https://api.eu.mailgun.net' 
+  key: process.env.MAILGUN_API_KEY
 });
 
-// 2. Configurer Multer pour stocker en MÉMOIRE (RAM)
-const storage = multer.memoryStorage();
+// ============================================
+// 📤 CONFIGURATION MULTER (Upload de fichiers)
+// ============================================
+const storage = multer.memoryStorage(); // Stockage en mémoire (pas sur disque)
+
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Limite à 10MB
+  limits: {
+    fileSize: 5 * 1024 * 1024, // Max 5MB
+    files: 1 // Max 1 fichier
+  },
+  fileFilter: (req, file, cb) => {
+    // Filtrage initial (sera vérifié à nouveau par le middleware)
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+    
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Type de fichier non autorisé'), false);
+    }
+  }
 });
 
-// --- Définition de la Route ---
-
-/**
- * @route POST /api/prescription/upload
- * Gère l'envoi d'ordonnance (zéro stockage)
- */
-router.post(
-  '/upload',
-  upload.single('prescriptionFile'), // 'prescriptionFile' est le 'name' de l'input
+// ============================================
+// 📍 ROUTE : POST /api/prescription
+// ============================================
+router.post('/', 
+  upload.single('prescription'), // Upload du fichier
+  validateFileUpload,           // Validation du fichier
+  validatePrescription,         // Validation des champs texte
   async (req, res) => {
-    
-    console.log('[INFO] Requête d\'upload reçue...');
-
     try {
-      // 1. Validation de la requête
-      if (!req.file) {
-        console.warn('[WARN] Tentative d\'upload sans fichier.');
-        return res.status(400).json({ message: 'Aucun fichier reçu.' });
+      const { name, email, phone, message } = req.body;
+      const file = req.file;
+
+      // Vérification finale de la présence du fichier
+      if (!file) {
+        return res.status(400).json({
+          error: 'Fichier manquant',
+          message: 'L\'ordonnance est obligatoire.'
+        });
       }
 
-      // 2. Validation du type de fichier (PDF uniquement)
-const allowedMimeTypes = ['application/pdf'];
-if (!allowedMimeTypes.includes(req.file.mimetype)) {
-  console.warn(`[WARN] Type de fichier non autorisé : ${req.file.mimetype}`);
-  return res.status(400).json({ 
-    message: 'Format de fichier non autorisé. Veuillez envoyer un fichier PDF uniquement.' 
-  });
-}
-
-// 3. Validation de l'extension du fichier (sécurité supplémentaire)
-const fileExtension = req.file.originalname.split('.').pop().toLowerCase();
-if (fileExtension !== 'pdf') {
-  console.warn(`[WARN] Extension de fichier non autorisée : ${fileExtension}`);
-  return res.status(400).json({ 
-    message: 'Extension de fichier non autorisée. Veuillez envoyer un fichier PDF (.pdf).' 
-  });
-}
-
-console.log('[INFO] Validation du fichier PDF réussie.');
-
-      // 4. Préparation des données de l'e-mail
-      // On utilise les variables de .env et les données du formulaire
-      const emailData = {
-        from: process.env.FROM_EMAIL,
-        to: [process.env.PHARMACIST_EMAIL],
-        subject: `Nouvelle ordonnance de ${name} (Site Web)`,
-        html: `
-          <h1>Nouvelle ordonnance en ligne</h1>
-          <p>Vous avez reçu une nouvelle ordonnance via le site web.</p>
-          <hr>
-          <h2>Informations Patient</h2>
-          <ul>
-            <li><strong>Nom :</strong> ${name || 'Non fourni'}</li>
-            <li><strong>Email :</strong> ${email || 'Non fourni'}</li>
-            <li><strong>Téléphone :</strong> ${phone || 'Non fourni'}</li>
-          </ul>
-          <hr>
-          <p>Le fichier de l'ordonnance ("${req.file.originalname}") est joint à cet e-mail.</p>
-        `,
-        // La pièce jointe est passée ici
-        attachment: [attachment], 
+      // ============================================
+      // 📧 CONSTRUCTION DE L'EMAIL
+      // ============================================
+      
+      // Préparer l'attachment pour Mailgun
+      const attachment = {
+        filename: file.originalname,
+        data: file.buffer,
+        contentType: file.mimetype
       };
 
-      // 5. Envoi de l'e-mail via Mailgun (nouvelle syntaxe)
-      // On utilise le DOMAINE de votre fichier .env
-      console.log(`[INFO] Envoi via Mailgun vers ${process.env.PHARMACIST_EMAIL}...`);
-      
-      const data = await mg.messages.create(
-        process.env.MAILGUN_DOMAIN, 
-        emailData
-      );
+      // Construire le corps de l'email
+      const emailBody = `
+═══════════════════════════════════════════════════
+📋 NOUVELLE ORDONNANCE REÇUE
+═══════════════════════════════════════════════════
 
-      console.log('[SUCCESS] Réponse de Mailgun:', data);
+👤 Informations du patient :
+   • Nom : ${name}
+   • Email : ${email}
+   • Téléphone : ${phone || 'Non renseigné'}
+
+💬 Message :
+${message || 'Aucun message'}
+
+📎 Fichier joint : ${file.originalname}
+📊 Taille : ${(file.size / 1024).toFixed(2)} KB
+📄 Type : ${file.mimetype}
+
+⏰ Date de réception : ${new Date().toLocaleString('fr-FR', { 
+        dateStyle: 'full', 
+        timeStyle: 'medium' 
+      })}
+
+═══════════════════════════════════════════════════
+
+⚠️ IMPORTANT : Ce message contient des données de santé.
+Traiter avec confidentialité.
+      `.trim();
+
+      // ============================================
+      // 📤 ENVOI DE L'EMAIL VIA MAILGUN
+      // ============================================
       
-      // 6. Réponse au client
+      const emailData = {
+        from: `Pharmacie Nord Montargis <noreply@${process.env.MAILGUN_DOMAIN}>`,
+        to: process.env.RECIPIENT_EMAIL,
+        subject: `🏥 Nouvelle ordonnance de ${name}`,
+        text: emailBody,
+        attachment: attachment
+      };
+
+      // Envoi de l'email
+      await mg.messages.create(process.env.MAILGUN_DOMAIN, emailData);
+
+      // ============================================
+      // ✅ RÉPONSE SUCCÈS
+      // ============================================
+      
+      console.log('✅ Ordonnance envoyée avec succès:', {
+        patient: name,
+        email: email,
+        file: file.originalname,
+        timestamp: new Date().toISOString()
+      });
+
       res.status(200).json({
-        message: 'Ordonnance envoyée avec succès !',
+        success: true,
+        message: 'Votre ordonnance a été envoyée avec succès !',
+        details: {
+          name: name,
+          email: email,
+          filename: file.originalname,
+          timestamp: new Date().toISOString()
+        }
       });
 
     } catch (error) {
-      // 7. Gestion des erreurs
-      console.error("[ERREUR] Échec de l'envoi Mailgun :");
-      if (error.response) {
-        // Erreur spécifique de l'API Mailgun
-        console.error('Status:', error.response.status);
-        console.error('Body:', error.response.body);
-      } else {
-        // Erreur générale
-        console.error(error.message);
-      }
+      // ============================================
+      // ❌ GESTION DES ERREURS
+      // ============================================
       
+      console.error('❌ Erreur lors de l\'envoi de l\'ordonnance:', {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      });
+
+      // Erreur Mailgun spécifique
+      if (error.status) {
+        return res.status(error.status).json({
+          error: 'Erreur d\'envoi',
+          message: 'Impossible d\'envoyer l\'email. Veuillez réessayer plus tard.',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+      }
+
+      // Erreur générique
       res.status(500).json({
-        message: "Une erreur est survenue lors de l'envoi. Veuillez réessayer.",
-        error: error.message || 'Erreur inconnue'
+        error: 'Erreur serveur',
+        message: 'Une erreur est survenue lors du traitement de votre demande.',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
-  },
+  }
 );
 
-// On exporte le routeur en CommonJS
+// ============================================
+// 📍 ROUTE DE TEST (Optionnelle - à supprimer en production)
+// ============================================
+router.get('/test', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Route prescription fonctionnelle',
+    validation: 'active',
+    rateLimit: 'active (10 req/heure)',
+    timestamp: new Date().toISOString()
+  });
+});
+
 module.exports = router;

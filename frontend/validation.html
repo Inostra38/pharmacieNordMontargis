@@ -112,11 +112,11 @@
                             <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Téléphone *
                             </label>
-                            <input type="tel" id="phone" name="phone" placeholder="Ex: 06 12 34 56 78" required
-                                pattern="^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$"
+                            <input type="tel" id="phone" name="phone" placeholder="Ex: 0612345678" required
+                                pattern="[0-9\s\.\-\+]{10,14}"
                                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition">
                             <small class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Nous vous contacterons si besoin concernant votre réservation
+                                Nous vous contacterons si besoin concernant votre réservation. Insérer numéro de téléphone français.
                             </small>
                         </div>
 
@@ -142,8 +142,6 @@
                                 placeholder="Ex: Je passerai demain vers 17h."
                                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-teal-500 transition"></textarea>
                         </div>
-
-                        <!-- LA CHECKBOX sendConfirmation A ÉTÉ SUPPRIMÉE -->
                     </div>
 
                     <!-- ========================================== -->

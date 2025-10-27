@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: formData.get('email'),
                 message: formData.get('message'),
                 sendConfirmation: true,                // MODIFICATION : Toujours true maintenant
-                items: cartItems,
+                cart: cartItems,
                 total: cartTotal
             };
 
