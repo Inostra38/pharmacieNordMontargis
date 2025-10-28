@@ -1,6 +1,7 @@
 // ==========================================
-// CookieConsent - Configuration ULTRA-SIMPLE et ACCESSIBLE
+// CookieConsent - Configuration ULTRA-SIMPLE
 // Pharmacie Nord Montargis
+// Tout visible - Pas d'accordéon
 // ==========================================
 
 // Fonction pour charger Google Analytics
@@ -32,8 +33,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     CookieConsent.run({
         
-        // Mode strict ARIA
+        // Mode strict RGPD
         mode: 'opt-in',
+        
+        // Désactiver l'accordéon - tout ouvert
+        guiOptions: {
+            consentModal: {
+                layout: 'box',
+                position: 'bottom center',
+                equalWeightButtons: true,
+                flipButtons: false
+            },
+            preferencesModal: {
+                layout: 'box',
+                position: 'right',
+                equalWeightButtons: true,
+                flipButtons: false
+            }
+        },
+        
+        // Cacher la bannière quand le modal s'ouvre
+        disablePageInteraction: true,
         
         // Catégories
         categories: {
@@ -42,37 +62,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 readOnly: true
             },
             analytics: {
-                enabled: false
+                enabled: false,
+                autoClear: {
+                    cookies: [
+                        {
+                            name: /^(_ga|_gid)/
+                        }
+                    ]
+                }
             }
         },
         
-        // Langue
+        // Langue française
         language: {
             default: 'fr',
             translations: {
                 fr: {
                     consentModal: {
                         title: 'Cookies',
-                        description: 'Ce site utilise des cookies pour améliorer votre expérience.',
-                        acceptAllBtn: 'Accepter',
-                        acceptNecessaryBtn: 'Refuser',
-                        showPreferencesBtn: 'Choisir'
+                        description: 'Ce site utilise des cookies pour améliorer votre expérience. Les cookies essentiels sont nécessaires au fonctionnement du site.',
+                        acceptAllBtn: 'Tout accepter',
+                        acceptNecessaryBtn: 'Tout refuser',
+                        showPreferencesBtn: 'Gérer mes préférences',
+                        footer: '<a href="/mentions-legales.html">Mentions légales</a>'
                     },
                     preferencesModal: {
-                        title: 'Vos préférences',
-                        acceptAllBtn: 'Accepter tout',
-                        acceptNecessaryBtn: 'Refuser',
-                        savePreferencesBtn: 'Valider',
+                        title: 'Préférences des cookies',
+                        acceptAllBtn: 'Tout accepter',
+                        acceptNecessaryBtn: 'Tout refuser',
+                        savePreferencesBtn: 'Enregistrer',
                         closeIconLabel: 'Fermer',
                         sections: [
                             {
                                 title: 'Cookies essentiels',
-                                description: 'Nécessaires au fonctionnement (panier, préférences).',
+                                description: 'Ces cookies sont nécessaires au bon fonctionnement du site. Ils ne peuvent pas être désactivés.',
                                 linkedCategory: 'necessary'
                             },
                             {
                                 title: 'Cookies statistiques',
-                                description: 'Pour améliorer le site (Google Analytics).',
+                                description: 'Ces cookies nous aident à améliorer le site en collectant des statistiques anonymes via Google Analytics.',
                                 linkedCategory: 'analytics'
                             }
                         ]
@@ -83,25 +111,53 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Callbacks
         onFirstConsent: function() {
+            console.log('🍪 Premier consentement enregistré');
             if (CookieConsent.acceptedCategory('analytics')) {
                 loadGA();
             }
         },
         
         onConsent: function() {
+            console.log('🍪 Consentement mis à jour');
             if (CookieConsent.acceptedCategory('analytics')) {
                 loadGA();
             }
         },
         
         onChange: function({changedCategories}) {
+            console.log('🔄 Catégories modifiées:', changedCategories);
             if (changedCategories && changedCategories.includes('analytics')) {
                 if (CookieConsent.acceptedCategory('analytics')) {
                     loadGA();
                 } else {
+                    console.log('🔄 Rechargement pour supprimer GA');
                     location.reload();
+                }
+            }
+        },
+        
+        onModalShow: function({modalName}) {
+            console.log('📋 Modal ouvert:', modalName);
+            // Cacher la bannière quand le modal de préférences s'ouvre
+            if (modalName === 'preferencesModal') {
+                const banner = document.querySelector('#cc-main .cm');
+                if (banner) {
+                    banner.style.display = 'none';
+                }
+            }
+        },
+        
+        onModalHide: function({modalName}) {
+            console.log('✖️ Modal fermé:', modalName);
+            // Réafficher la bannière si aucun consentement n'a été donné
+            if (modalName === 'preferencesModal') {
+                const banner = document.querySelector('#cc-main .cm');
+                if (banner && !CookieConsent.validConsent()) {
+                    banner.style.display = 'block';
                 }
             }
         }
     });
+    
+    console.log('✅ CookieConsent initialisé');
 });

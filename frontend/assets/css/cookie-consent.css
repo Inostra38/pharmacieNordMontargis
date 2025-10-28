@@ -1,6 +1,7 @@
 /* ==========================================
-   COOKIECONSENT - ULTRA SIMPLE & ACCESSIBLE
-   Pharmacie Nord Montargis - CORRIGÉ
+   COOKIECONSENT - MINIMALISTE & ARIA
+   Pharmacie Nord Montargis
+   Contrastes WCAG 2.1 AA conformes
    ========================================== */
 
 /* Reset de base */
@@ -9,156 +10,148 @@
 }
 
 /* ==========================================
-   BANNIÈRE (en bas)
+   BANNIÈRE PRINCIPALE
    ========================================== */
 
 #cc-main .cm {
     position: fixed !important;
-    bottom: 16px !important;
-    left: 16px !important;
-    right: 16px !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     max-width: 500px !important;
-    margin: 0 auto !important;
+    width: calc(100% - 40px) !important;
     padding: 20px !important;
-    background: white !important;
-    border: 2px solid #e5e7eb !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
-    font-family: system-ui, -apple-system, sans-serif !important;
-}
-
-html.dark #cc-main .cm {
-    background: #1f2937 !important;
-    border-color: #4b5563 !important;
+    background: #FFFFFF !important;
+    border: 1px solid #CCCCCC !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+    z-index: 9999 !important;
 }
 
 /* Titre */
 #cc-main .cm__title {
     font-size: 18px !important;
-    font-weight: 600 !important;
-    color: #111827 !important;
-    margin: 0 0 8px 0 !important;
+    font-weight: 700 !important;
+    margin: 0 0 12px 0 !important;
+    color: #000000 !important;
 }
 
-html.dark #cc-main .cm__title {
-    color: white !important;
-}
-
-/* Texte */
+/* Description */
 #cc-main .cm__desc {
     font-size: 14px !important;
-    color: #6b7280 !important;
     line-height: 1.5 !important;
     margin: 0 0 16px 0 !important;
+    color: #333333 !important;
 }
 
-html.dark #cc-main .cm__desc {
-    color: #d1d5db !important;
+/* Footer */
+#cc-main .cm__footer {
+    margin-top: 16px !important;
+    padding-top: 16px !important;
+    border-top: 1px solid #CCCCCC !important;
 }
 
-/* Boutons */
-#cc-main .cm__btns {
+#cc-main .cm__footer a {
+    color: #0066CC !important;
+    text-decoration: underline !important;
+    font-size: 14px !important;
+}
+
+/* ==========================================
+   BOUTONS
+   ========================================== */
+
+#cc-main .cm__btns,
+#cc-main .pm__btns {
     display: flex !important;
-    gap: 8px !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
     flex-wrap: wrap !important;
 }
 
 #cc-main button {
-    font-size: 14px !important;
-    font-weight: 500 !important;
+    flex: 1 !important;
+    min-width: 100px !important;
     padding: 10px 16px !important;
-    border: none !important;
-    border-radius: 6px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
     cursor: pointer !important;
-    transition: 0.2s !important;
+    font-family: inherit !important;
+    border: 2px solid #000000 !important;
 }
 
-/* Accepter */
-#cc-main .cm__btn[data-role="all"] {
-    background: #0d9488 !important;
-    color: white !important;
-    flex: 1 !important;
+/* Bouton principal (Tout accepter) */
+#cc-main .cm__btn--primary,
+#cc-main .pm__btn--primary {
+    background: #0066CC !important;
+    color: #FFFFFF !important;
+    border-color: #0066CC !important;
 }
 
-#cc-main .cm__btn[data-role="all"]:hover {
-    background: #0f766e !important;
+#cc-main .cm__btn--primary:hover,
+#cc-main .pm__btn--primary:hover {
+    background: #0052A3 !important;
+    border-color: #0052A3 !important;
 }
 
-#cc-main .cm__btn[data-role="all"]:focus {
-    outline: 3px solid #5eead4 !important;
-    outline-offset: 2px !important;
+/* Bouton secondaire (Tout refuser) */
+#cc-main .cm__btn--secondary,
+#cc-main .pm__btn--secondary {
+    background: #F5F5F5 !important;
+    color: #333333 !important;
+    border-color: #333333 !important;
 }
 
-/* Refuser */
-#cc-main .cm__btn[data-role="necessary"] {
-    background: #f3f4f6 !important;
-    color: #374151 !important;
-    flex: 1 !important;
+#cc-main .cm__btn--secondary:hover,
+#cc-main .pm__btn--secondary:hover {
+    background: #E0E0E0 !important;
 }
 
-#cc-main .cm__btn[data-role="necessary"]:hover {
-    background: #e5e7eb !important;
+/* Bouton tertiaire (Gérer) */
+#cc-main button[data-role="show-settings"],
+#cc-main .pm__btn {
+    background: #FFFFFF !important;
+    color: #0066CC !important;
+    border-color: #0066CC !important;
 }
 
-html.dark #cc-main .cm__btn[data-role="necessary"] {
-    background: #374151 !important;
-    color: white !important;
-}
-
-/* Choisir */
-#cc-main .cm__btn[data-role="show"] {
-    background: transparent !important;
-    color: #0d9488 !important;
-    text-decoration: underline !important;
-    width: 100% !important;
-}
-
-#cc-main .cm__btn[data-role="show"]:hover {
-    color: #0f766e !important;
+#cc-main button[data-role="show-settings"]:hover,
+#cc-main .pm__btn:hover {
+    background: #F0F8FF !important;
 }
 
 /* ==========================================
-   MODAL
+   MODAL DE PRÉFÉRENCES
    ========================================== */
 
-/* Overlay */
-#cc-main #s-inr {
-    background: rgba(0,0,0,0.5) !important;
+/* Masquer la bannière quand le modal est ouvert */
+#cc-main.show--settings .cm,
+#cc-main .cm.cm--hidden,
+body.show--consent #cc-main .cm {
+    display: none !important;
+    visibility: hidden !important;
 }
 
-/* Container */
 #cc-main .pm {
-    background: white !important;
-    border-radius: 12px !important;
-    max-width: 550px !important;
-    max-height: 80vh !important;
-    margin: 40px auto !important;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: 600px !important;
+    width: calc(100% - 40px) !important;
+    max-height: 85vh !important;
+    padding: 24px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #CCCCCC !important;
+    overflow-y: auto !important;
+    z-index: 10000 !important;
 }
 
-html.dark #cc-main .pm {
-    background: #1f2937 !important;
-}
-
-/* Header */
-#cc-main .pm__header {
-    padding: 20px !important;
-    border-bottom: 1px solid #e5e7eb !important;
-}
-
-html.dark #cc-main .pm__header {
-    border-color: #374151 !important;
-}
-
+/* Titre du modal */
 #cc-main .pm__title {
     font-size: 20px !important;
     font-weight: 700 !important;
-    color: #111827 !important;
-    margin: 0 !important;
-}
-
-html.dark #cc-main .pm__title {
-    color: white !important;
+    margin: 0 0 20px 0 !important;
+    color: #000000 !important;
 }
 
 /* Bouton fermer */
@@ -166,237 +159,193 @@ html.dark #cc-main .pm__title {
     position: absolute !important;
     top: 16px !important;
     right: 16px !important;
-    width: 32px !important;
-    height: 32px !important;
-    background: #f3f4f6 !important;
-    border-radius: 6px !important;
-    color: #6b7280 !important;
+    background: #FFFFFF !important;
+    border: 1px solid #CCCCCC !important;
+    font-size: 20px !important;
+    color: #333333 !important;
     cursor: pointer !important;
+    padding: 4px 8px !important;
+    line-height: 1 !important;
+    min-width: auto !important;
 }
 
 #cc-main .pm__close-btn:hover {
-    background: #e5e7eb !important;
+    background: #F5F5F5 !important;
 }
 
-#cc-main .pm__close-btn:focus {
-    outline: 3px solid #0d9488 !important;
-}
+/* ==========================================
+   SECTIONS - TOUJOURS OUVERTES
+   ========================================== */
 
-/* Body */
-#cc-main .pm__body {
-    padding: 20px !important;
-    overflow-y: auto !important;
-    max-height: 50vh !important;
-}
-
-/* Sections */
 #cc-main .pm__section {
-    background: #f9fafb !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 8px !important;
+    margin-bottom: 20px !important;
     padding: 16px !important;
-    margin-bottom: 12px !important;
+    background: #F5F5F5 !important;
+    border: 1px solid #CCCCCC !important;
 }
 
-html.dark #cc-main .pm__section {
-    background: #111827 !important;
-    border-color: #374151 !important;
-}
-
-/* ==========================================
-   CORRECTION 1 : Espacement titre/toggle
-   ========================================== */
-
-/* Header de section avec toggle */
-#cc-main .pm__section-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin-bottom: 8px !important;
-    gap: 16px !important; /* ← AJOUTÉ : Espace entre titre et toggle */
-}
-
-/* Titre de section */
+/* Titre de section - SANS FLÈCHE */
 #cc-main .pm__section-title {
-    font-size: 15px !important;
+    font-size: 16px !important;
     font-weight: 600 !important;
-    color: #111827 !important;
-    margin: 0 !important; /* ← Pas de marge pour éviter chevauchement */
-    flex: 1 !important; /* ← Prend l'espace disponible */
-    padding-right: 8px !important; /* ← Espace de sécurité */
+    margin: 0 0 8px 0 !important;
+    color: #000000 !important;
+    display: block !important;
+    cursor: default !important;
+    padding: 0 !important;
 }
 
-html.dark #cc-main .pm__section-title {
-    color: white !important;
+/* SUPPRIMER TOUTES LES FLÈCHES */
+#cc-main .pm__section-title::before,
+#cc-main .pm__section-title::after,
+#cc-main .pm__section-arrow,
+#cc-main [class*="arrow"],
+#cc-main [class*="chevron"],
+#cc-main .pm__section-toggle-icon {
+    display: none !important;
+    content: none !important;
 }
 
+/* Description de section */
 #cc-main .pm__section-desc {
-    font-size: 13px !important;
-    color: #6b7280 !important;
+    font-size: 14px !important;
     line-height: 1.5 !important;
-    margin: 0 !important;
+    margin: 0 0 12px 0 !important;
+    color: #333333 !important;
 }
 
-html.dark #cc-main .pm__section-desc {
-    color: #d1d5db !important;
+/* Contenu de section - TOUJOURS VISIBLE */
+#cc-main .pm__section-body {
+    display: block !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    margin-top: 12px !important;
 }
 
 /* ==========================================
-   CORRECTION 2 : Toggle vert émeraude visible
+   TOGGLE (interrupteur)
    ========================================== */
 
-/* Toggle switch */
-#cc-main .pm__switch {
+#cc-main .section__toggle {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-top: 12px !important;
+}
+
+#cc-main .toggle {
     position: relative !important;
     width: 44px !important;
-    height: 22px !important;
-    flex-shrink: 0 !important; /* ← Ne rétrécit jamais */
-}
-
-#cc-main .pm__switch input {
-    display: none !important;
-}
-
-/* Slider du toggle (état désactivé) */
-#cc-main .pm__switch-slider {
-    position: absolute !important;
-    inset: 0 !important;
-    background: #d1d5db !important; /* Gris clair quand désactivé */
-    border-radius: 22px !important;
+    height: 24px !important;
+    background: #CCCCCC !important;
+    border: 1px solid #999999 !important;
     cursor: pointer !important;
-    transition: 0.3s !important;
 }
 
-/* Slider du toggle (état ACTIVÉ) - VERT ÉMERAUDE */
-#cc-main .pm__switch input:checked + .pm__switch-slider {
-    background: #10b981 !important; /* ← VERT ÉMERAUDE (emerald-500) */
-}
-
-html.dark #cc-main .pm__switch input:checked + .pm__switch-slider {
-    background: #34d399 !important; /* ← VERT ÉMERAUDE plus clair en dark mode */
-}
-
-/* Bouton rond blanc du toggle */
-#cc-main .pm__switch-slider:before {
-    content: "" !important;
+#cc-main .toggle::after {
+    content: '' !important;
     position: absolute !important;
-    width: 16px !important;
-    height: 16px !important;
-    left: 3px !important;
-    bottom: 3px !important;
-    background: white !important;
-    border-radius: 50% !important;
-    transition: 0.3s !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important; /* ← Ombre pour visibilité */
+    top: 2px !important;
+    left: 2px !important;
+    width: 18px !important;
+    height: 18px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #999999 !important;
 }
 
-/* Bouton déplacé quand activé */
-#cc-main .pm__switch input:checked + .pm__switch-slider:before {
-    transform: translateX(22px) !important;
+/* Toggle activé */
+#cc-main input[type="checkbox"]:checked + .toggle {
+    background: #0066CC !important;
+    border-color: #0066CC !important;
 }
 
-/* Toggle désactivé (cookies nécessaires) */
-#cc-main .pm__switch input:disabled + .pm__switch-slider {
+#cc-main input[type="checkbox"]:checked + .toggle::after {
+    transform: translateX(20px) !important;
+}
+
+/* Toggle désactivé (read-only) */
+#cc-main input[type="checkbox"]:disabled + .toggle {
     opacity: 0.5 !important;
     cursor: not-allowed !important;
-    background: #d1d5db !important; /* Toujours gris si désactivé */
 }
 
-/* Focus sur le toggle (accessibilité) */
-#cc-main .pm__switch:focus-within .pm__switch-slider {
-    outline: 3px solid #5eead4 !important;
-    outline-offset: 2px !important;
+/* Input caché */
+#cc-main input[type="checkbox"] {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Label du toggle */
+#cc-main .toggle__label {
+    font-size: 14px !important;
+    color: #333333 !important;
+    font-weight: 600 !important;
 }
 
 /* ==========================================
-   FOOTER
+   OVERLAY (fond sombre)
    ========================================== */
 
-#cc-main .pm__footer {
-    padding: 16px 20px !important;
-    border-top: 1px solid #e5e7eb !important;
-    display: flex !important;
-    gap: 8px !important;
-}
-
-html.dark #cc-main .pm__footer {
-    border-color: #374151 !important;
-}
-
-#cc-main .pm__footer button {
-    flex: 1 !important;
-    font-size: 14px !important;
-    padding: 10px !important;
-    border-radius: 6px !important;
-}
-
-#cc-main .pm__footer .pm__btn[data-role="save"] {
-    background: #0d9488 !important;
-    color: white !important;
-}
-
-#cc-main .pm__footer .pm__btn[data-role="save"]:hover {
-    background: #0f766e !important;
-}
-
-#cc-main .pm__footer .pm__btn[data-role="all"] {
-    background: #f3f4f6 !important;
-    color: #374151 !important;
-}
-
-html.dark #cc-main .pm__footer .pm__btn[data-role="all"] {
-    background: #374151 !important;
-    color: white !important;
+#cc-main .pm__overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 9998 !important;
 }
 
 /* ==========================================
-   MOBILE
+   RESPONSIVE MOBILE
    ========================================== */
 
 @media (max-width: 640px) {
     #cc-main .cm {
-        left: 8px !important;
-        right: 8px !important;
-        bottom: 8px !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 16px !important;
     }
     
     #cc-main .pm {
-        margin: 16px !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        padding: 16px !important;
+    }
+    
+    #cc-main button {
+        min-width: 80px !important;
+        font-size: 14px !important;
+        padding: 10px 12px !important;
+    }
+    
+    #cc-main .pm__section {
+        padding: 12px !important;
     }
 }
 
 /* ==========================================
-   ACCESSIBILITÉ RENFORCÉE
+   ACCESSIBILITÉ (Focus visible)
    ========================================== */
 
-/* Focus visible pour tous les éléments interactifs */
-#cc-main button:focus-visible,
-#cc-main a:focus-visible {
-    outline: 3px solid #0d9488 !important;
+#cc-main button:focus-visible {
+    outline: 3px solid #0066CC !important;
     outline-offset: 2px !important;
 }
 
-/* Animations respectant prefers-reduced-motion */
-@media (prefers-reduced-motion: reduce) {
-    #cc-main * {
-        transition: none !important;
-        animation: none !important;
-    }
-}
-
-/* Contraste élevé */
-@media (prefers-contrast: high) {
-    #cc-main .cm {
-        border-width: 3px !important;
-    }
-    
-    #cc-main button {
-        border: 2px solid currentColor !important;
-    }
-    
-    /* Toggle encore plus visible en mode contraste élevé */
-    #cc-main .pm__switch input:checked + .pm__switch-slider {
-        background: #059669 !important; /* Vert encore plus foncé */
-        border: 2px solid #047857 !important;
-    }
+#cc-main a:focus-visible {
+    outline: 2px solid #0066CC !important;
+    outline-offset: 2px !important;
 }
