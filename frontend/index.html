@@ -17,18 +17,18 @@
     <meta property="og:title" content="Pharmacie Nord Montargis | Votre Santé, Notre Priorité">
     <meta property="og:description"
         content="Votre pharmacie de confiance à Châlette-sur-Loing. Services professionnels et conseils personnalisés.">
-    <meta property="og:image" content="assets/logo_pharmacie_nord_montargis.webp">
+    <meta property="og:image" content="assets/images/logo_pharmacie_nord_montargis.webp">
     <meta property="og:url" content="https://www.pharmacienordmontargis.fr">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="fr_FR">
 
     <!--CookieConsent-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.css"
-        media="print" onload="this.media='all'" />
-    <script defer src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.0.1/dist/cookieconsent.css">
+    <link rel="stylesheet" href="assets/css/cookie-consent.css">
+    <script defer src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.0.1/dist/cookieconsent.umd.js"></script>
 
     <!--Favicon-->
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png">
 
     <!-- Preconnect pour optimisation -->
     <link
@@ -37,7 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Préchargement des ressources critiques -->
-    <link rel="preload" href="assets/logo_pharmacie_nord_montargis.webp" as="image">
+    <link rel="preload" href="assets/images/logo_pharmacie_nord_montargis.webp" as="image">
 
     <!-- Fonts -->
     <link
@@ -48,7 +48,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="light-mode-colors.css">
+    <link rel="stylesheet" href="assets/css/light-mode-colors.css">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -144,7 +144,7 @@
             <!-- Logo pharmacie -->
             <div
                 class="flex-shrink-0 w-40 h-40 sm:w-52 sm:h-52 lg:w-64 lg:h-64 bg-white dark:bg-gray-700 rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center hover-lift">
-                <img src="assets/logo_pharmacie_nord_montargis.webp" alt="Logo Pharmacie Nord Montargis"
+                <img src="assets/images/logo_pharmacie_nord_montargis.webp" alt="Logo Pharmacie Nord Montargis"
                     class="w-full h-full object-contain p-3" loading="eager" />
             </div>
 
@@ -256,9 +256,9 @@
                                 <span class="material-symbols-outlined text-teal-600 dark:text-teal-400"
                                     aria-hidden="true">email</span>
                                 <div>
-                                    <img src="assets/email-contact-light.svg" alt="Adresse e-mail de contact"
+                                    <img src="assets/images/email-contact-light.svg" alt="Adresse e-mail de contact"
                                         class="h-5 block dark:hidden" />
-                                    <img src="assets/email-contact-dark.svg" alt="Adresse e-mail de contact"
+                                    <img src="assets/images/email-contact-dark.svg" alt="Adresse e-mail de contact"
                                         class="h-5 hidden dark:block" />
                                     <p class="text-sm text-gray-600 dark:text-gray-400">Réponse sous 24h</p>
                                 </div>
@@ -803,26 +803,31 @@
                 </div>
 
                 <div class="map-container">
-                    <iframe width="100%" height="350" frameborder="0"
-                        class="border-0 rounded-xl dark:grayscale dark:contrast-[.90]"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        src="https://www.google.com/maps?q=Pharmacie+Nord+Montargis,17+avenue+du+général+Leclerc,45120+Chalette-sur-Loing&output=embed"
-                        allowfullscreen loading="lazy" title="Localisation de la Pharmacie Nord Montargis">
-                    </iframe>
-                </div>>
+                    <a href="https://maps.app.goo.gl/ZEBSqyuATMxEqUfu6" target="_blank" rel="noopener noreferrer"
+                        class="block relative group cursor-pointer">
 
-                <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                        <svg class="w-4 h-4 mr-2 text-teal-600 dark:text-teal-300 flex-shrink-0" fill="currentColor"
-                            viewBox="0 0 20 20" aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        <span class="font-medium">CC Commercial Carrefour Market, 17 avenue du Général Leclerc, 45120
-                            Châlette-sur-Loing</span>
-                    </div>
+                        <img src="assets/images/map-pharmacie-nord-montargis.jpg"
+                            alt="Cliquez pour ouvrir Google Maps - Pharmacie Nord Montargis" width="100%" height="350"
+                            class="border-0 rounded-xl dark:grayscale dark:contrast-[.90] transition-transform duration-300 group-hover:scale-[1.02]"
+                            loading="lazy" />
+
+                    </a>
                 </div>
+
+            </div>
+
+            <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                    <svg class="w-4 h-4 mr-2 text-teal-600 dark:text-teal-300 flex-shrink-0" fill="currentColor"
+                        viewBox="0 0 20 20" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="font-medium">CC Commercial Carrefour Market, 17 avenue du Général Leclerc, 45120
+                        Châlette-sur-Loing</span>
+                </div>
+            </div>
             </div>
         </section>
 

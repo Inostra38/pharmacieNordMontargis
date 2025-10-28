@@ -152,8 +152,6 @@ const moderateApiLimiter = rateLimit({
 
 const prescriptionRoutes = require('./routes/prescription');
 app.use('/api/prescription', strictApiLimiter, prescriptionRoutes);
-
-// ✅ CORRECTION : Monter sur /api/cart au lieu de /api/cart/send-reservation
 const cartRoutes = require('./routes/cart');
 app.use('/api/cart', moderateApiLimiter, cartRoutes);
 
