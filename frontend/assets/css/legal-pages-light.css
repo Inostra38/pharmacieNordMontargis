@@ -1,0 +1,229 @@
+/* ==========================================
+   CSS PAGES LÉGALES - MODE CLAIR UNIQUEMENT
+   Fichier: legal-pages-light.css
+   Pages: mentions-legales.html, politique-confidentialite.html
+   ========================================== */
+
+/* ==========================================
+   GRADIENT ANIMATION (Hero Section)
+   ========================================== */
+
+.gradient-animation {
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ==========================================
+   BACKGROUND & TEXT
+   ========================================== */
+
+body {
+    background-color: #f8fafc;
+}
+
+/* ==========================================
+   CARTES & CONTENEURS
+   ========================================== */
+
+.bg-white {
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+/* ==========================================
+   TEXTES
+   ========================================== */
+
+.text-gray-800 {
+    color: #1e293b;
+}
+
+.text-gray-700 {
+    color: #334155;
+}
+
+.text-gray-600 {
+    color: #475569;
+}
+
+.text-gray-500 {
+    color: #64748b;
+}
+
+.text-teal-700 {
+    color: #0f766e;
+}
+
+/* ==========================================
+   NAVIGATION
+   ========================================== */
+
+nav {
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+
+footer {
+    background: linear-gradient(to right, #0f766e, #0d9488);
+}
+
+/* ==========================================
+   STYLES PROSE (Articles)
+   ========================================== */
+
+/* Titres H1 */
+.prose h1 {
+    color: #0f766e;
+    font-weight: 700;
+    font-size: 2.25em;
+    margin-top: 0;
+    margin-bottom: 0.8888889em;
+    line-height: 1.1111111;
+}
+
+/* Titres H2 */
+.prose h2 {
+    color: #0f766e !important;
+    font-weight: 700;
+    font-size: 1.5em;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    line-height: 1.3333333;
+}
+
+/* Titres H3 */
+.prose h3 {
+    color: #0f766e;
+    font-weight: 600;
+    font-size: 1.25em;
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+    line-height: 1.6;
+}
+
+/* Titres H4 */
+.prose h4 {
+    color: #0f766e;
+    font-weight: 600;
+    font-size: 1em;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    line-height: 1.5;
+}
+
+/* Texte en gras */
+.prose strong {
+    color: #0f766e;
+    font-weight: 600;
+}
+
+/* Paragraphes */
+.prose p {
+    color: #334155;
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    line-height: 1.75;
+}
+
+/* Premier paragraphe après un titre */
+.prose h2 + p {
+    margin-top: 0.5em;
+}
+
+/* Liens */
+.prose a {
+    color: #0891b2;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.prose a:hover {
+    color: #0e7490;
+}
+
+/* Listes */
+.prose ul {
+    list-style-type: disc;
+    padding-left: 1.625em;
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    color: #334155;
+}
+
+.prose ol {
+    list-style-type: decimal;
+    padding-left: 1.625em;
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    color: #334155;
+}
+
+.prose li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+/* Éléments imbriqués dans les listes */
+.prose li p {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+}
+
+/* Espacement entre sections */
+.prose > * + * {
+    margin-top: 1.25em;
+}
+
+/* Espacement spécial après les titres */
+.prose > h2 + * {
+    margin-top: 1em;
+}
+
+.prose > h3 + * {
+    margin-top: 0.75em;
+}
+
+/* ==========================================
+   UTILITAIRES
+   ========================================== */
+
+/* Transitions douces */
+.transition-colors-slow {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Animation d'apparition au scroll */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Effet hover lift */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+}
