@@ -1,6 +1,6 @@
 // ==========================================
 // Gestionnaire des Produits - Page d'Accueil
-// VERSION OPTIMISÉE + GESTION PROMO POUR PANIER
+// VERSION OPTIMISÉE + GESTION PROMO POUR PANIER + SKELETON LOADER
 // ==========================================
 
 class HomeProductsManager {
@@ -34,10 +34,10 @@ class HomeProductsManager {
     async loadFeaturedProducts() {
         try {
             console.log('🔥 Chargement ultra-rapide des produits (endpoint optimisé)...');
-            this.showLoading();
+            this.showSkeletonLoader(); // ✅ NOUVEAU : Skeleton au lieu de showLoading()
             
             const startTime = performance.now();
-            const response = await apiService.getHomeProducts(); //
+            const response = await apiService.getHomeProducts();
             const endTime = performance.now();
             const totalTime = Math.round(endTime - startTime);
             
@@ -58,6 +58,46 @@ class HomeProductsManager {
             console.error('❌ Erreur lors du chargement des produits:', error);
             this.showError('Impossible de charger les produits. Veuillez réessayer.');
         }
+    }
+
+    /**
+     * 🎨 NOUVEAU : Afficher le skeleton loader pendant le chargement
+     */
+    showSkeletonLoader() {
+        if (!this.productsGrid) return;
+        
+        // Créer 6 cartes skeleton (2 lignes de 3 sur desktop)
+        const skeletonHTML = Array(6).fill('').map(() => `
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden animate-pulse">
+                <div class="p-4">
+                    <!-- Badges skeleton -->
+                    <div class="flex gap-2 mb-3">
+                        <div class="h-6 bg-gray-200 dark:bg-gray-600 rounded-full w-24"></div>
+                    </div>
+                    
+                    <!-- Titre skeleton -->
+                    <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full mb-3"></div>
+                    
+                    <!-- Marque + CIP skeleton -->
+                    <div class="h-3 bg-gray-200 dark:bg-gray-600 rounded w-1/2 mb-3"></div>
+                    
+                    <!-- Prix skeleton -->
+                    <div class="flex items-baseline gap-2 mb-3">
+                        <div class="h-6 bg-gray-200 dark:bg-gray-600 rounded w-20"></div>
+                        <div class="h-5 bg-gray-200 dark:bg-gray-600 rounded w-16"></div>
+                    </div>
+                    
+                    <!-- Stock skeleton -->
+                    <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24 mb-3"></div>
+                    
+                    <!-- Bouton skeleton -->
+                    <div class="h-10 bg-gray-200 dark:bg-gray-600 rounded w-full"></div>
+                </div>
+            </div>
+        `).join('');
+        
+        this.productsGrid.innerHTML = skeletonHTML;
     }
 
     /**
@@ -163,15 +203,15 @@ class HomeProductsManager {
     }
 
     /**
-     * Créer une carte produit (Mis à jour avec les data-* et bouton/lien dynamique)
+     * Créer une carte produit (VOTRE VERSION ORIGINALE)
      */
     createProductCard(product) {
         // --- Récupération des données produit ---
-        const promoLabel = (product.promotions || product.promo_libelle || '').trim(); //
+        const promoLabel = (product.promotions || product.promo_libelle || '').trim();
         const promoNorm = this.norm(promoLabel);
         const lotSize = product.lot_size;
         const lotTotal = product.lot_total;
-        const requiresPrescription = product.tableau; //
+        const requiresPrescription = product.tableau;
         const basePrice = product.prix; // Prix avant promo
         const finalUnitPrice = product.prix_promo || product.prix; // Prix unitaire final
         
@@ -229,12 +269,12 @@ class HomeProductsManager {
                     class="reserve-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
                     data-id="${product.id || product.identifiant}"
                     data-name="${this.escapeHtml(product.libelle)}"
-                    data-price="${finalUnitPrice}"      /* Prix unitaire final */
-                    data-base-price="${basePrice}"      /* Prix avant promo */
+                    data-price="${finalUnitPrice}"
+                    data-base-price="${basePrice}"
                     data-cip="${product.code_cip || product.cip}"
-                    data-promo-libelle="${this.escapeHtml(promoLabel)}" /* Libellé promo */
-                    data-lot-size="${lotSize || ''}"        /* Taille lot */
-                    data-lot-total="${lotTotal || ''}"      /* Prix lot */
+                    data-promo-libelle="${this.escapeHtml(promoLabel)}"
+                    data-lot-size="${lotSize || ''}"
+                    data-lot-total="${lotTotal || ''}"
                 >
                     <span class="material-symbols-outlined text-sm">shopping_cart</span>
                     Réserver
@@ -259,13 +299,51 @@ class HomeProductsManager {
         `;
     }
 
-    // --- Fonctions showLoading, showEmptyState, showError, showStatus, hideStatus ---
-    // (Ces fonctions restent identiques à votre version précédente)
-    showLoading() { /* ... */ }
-    showEmptyState() { /* ... */ }
-    showError(message) { /* ... */ }
-    showStatus(message, type = 'info') { /* ... */ }
-    hideStatus() { /* ... */ }
+    /**
+     * Afficher l'état vide
+     */
+    showEmptyState() {
+        if (!this.productsGrid) return;
+        
+        this.productsGrid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <div class="text-6xl mb-4">🔍</div>
+                <p class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                    Aucune promotion disponible pour le moment
+                </p>
+                <p class="text-gray-500 dark:text-gray-500">
+                    Revenez bientôt pour découvrir nos offres !
+                </p>
+            </div>
+        `;
+    }
+
+    /**
+     * Afficher une erreur
+     */
+    showError(message) {
+        if (!this.productsGrid) return;
+        
+        this.productsGrid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <div class="text-6xl mb-4">⚠️</div>
+                <p class="text-xl font-semibold text-red-600 dark:text-red-400 mb-2">
+                    Erreur de chargement
+                </p>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    ${message}
+                </p>
+                <button onclick="location.reload()" 
+                        class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                    Réessayer
+                </button>
+            </div>
+        `;
+    }
+
+    showLoading() { /* Ancienne fonction, remplacée par showSkeletonLoader */ }
+    showStatus(message, type = 'info') { /* Fonction existante */ }
+    hideStatus() { /* Fonction existante */ }
 
 } // Fin de la classe HomeProductsManager
 
@@ -275,8 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('✅ DOM chargé, initialisation du HomeProductsManager optimisé...');
     homeProducts = new HomeProductsManager();
     
-    // ... (Gestion du drawer panier identique) ...
-     // Gestion du drawer panier
+    // Gestion du drawer panier
     const cartBtn = document.getElementById('cartButton');
     const cartDrawer = document.getElementById('cartDrawer');
     const cartOverlay = document.getElementById('cartOverlay');
@@ -305,8 +382,5 @@ document.addEventListener('DOMContentLoaded', () => {
             cartDrawer.classList.add('-translate-x-full');
             cartOverlay.classList.add('hidden');
         });
-        
-        // Valider le panier (Lien <a> maintenant)
-        // Pas besoin d'event listener ici car c'est un lien
     }
 });
