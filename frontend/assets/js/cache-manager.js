@@ -1,11 +1,12 @@
 // ==========================================
 // Cache Manager - Gestion centralisée du cache produits
+// VERSION SÉCURISÉE - Utilise apiService
 // ==========================================
 
 class ProductCacheManager {
     constructor() {
         this.CACHE_KEY = 'pharmacie_products_cache';
-        this.TTL = 4 * 60 * 60 * 1000; // 4 heures en millisecondes
+        this.TTL = 10 * 60 * 1000; // 10 minutes (correspond au cache serveur)
         this.isLoading = false;
     }
 
@@ -45,7 +46,7 @@ class ProductCacheManager {
                 products: products,
                 timestamp: Date.now(),
                 metadata: metadata,
-                version: '1.0'
+                version: '2.0' // Version sécurisée
             };
 
             localStorage.setItem(this.CACHE_KEY, JSON.stringify(data));
@@ -76,12 +77,12 @@ class ProductCacheManager {
     async load(forceRefresh = false) {
         if (this.isLoading) {
             console.log('⏳ Chargement déjà en cours...');
-            // Modification : retourner une promesse qui attend la fin du chargement en cours
+            // Retourner une promesse qui attend la fin du chargement en cours
             return new Promise(resolve => {
                 const interval = setInterval(() => {
                     if (!this.isLoading) {
                         clearInterval(interval);
-                        const cached = this.get(); // Récupérer le résultat frais
+                        const cached = this.get();
                         resolve(cached ? cached.products : []);
                     }
                 }, 100);
@@ -96,59 +97,60 @@ class ProductCacheManager {
             }
         }
 
-        // Charger depuis l'API
+        // Charger depuis l'API via apiService
         this.isLoading = true;
-        console.log('📡 Chargement depuis l\'API...');
+        console.log('📡 Chargement depuis l\'API (via backend sécurisé)...');
 
         try {
-            const url = new URL(CONFIG.API.BASE_URL);
-            url.searchParams.set('limit', '50000'); // Toujours charger tout
-            url.searchParams.set('t', Date.now()); // Cache busting
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+            // ✅ NOUVEAU : Utiliser apiService au lieu de fetch direct
+            if (typeof window.apiService === 'undefined') {
+                throw new Error('apiService non disponible. Vérifiez que api.js est chargé.');
             }
 
-            const data = await response.json();
-            // Vérification si la réponse est bien un objet avec 'items'
-            if (typeof data !== 'object' || data === null || !Array.isArray(data.items)) {
-                 console.error('❌ Réponse API invalide:', data);
-                 throw new Error('Format de réponse API incorrect reçu.');
+            const result = await window.apiService.getProducts({
+                limit: 50000 // Charger tous les produits
+            });
+
+            if (!result.success || !result.data || !Array.isArray(result.data.products)) {
+                console.error('❌ Réponse API invalide:', result);
+                throw new Error('Format de réponse API incorrect.');
             }
 
-            const products = data.items || [];
+            const products = result.data.products;
 
             console.log('✅ API:', products.length, 'produits reçus');
+            console.log('📊 Cache serveur:', result.data.cached ? 'utilisé' : 'rafraîchi');
 
             // Sauvegarder dans le cache
             this.set(products, {
-                total: data.total || products.length, // Utiliser la longueur si total manque
-                updatedAt: data.stockUpdatedAt || data.updatedAt
+                total: result.data.total || products.length,
+                updatedAt: result.data.updatedAt,
+                serverCached: result.data.cached
             });
 
             return products;
 
         } catch (error) {
             console.error('❌ Erreur chargement API:', error);
+            
             // En cas d'erreur API, essayer de retourner un cache expiré s'il existe
             const expiredCache = JSON.parse(localStorage.getItem(this.CACHE_KEY) || 'null');
             if (expiredCache && expiredCache.products) {
                 console.warn('⚠️ Utilisation du cache expiré suite à une erreur API.');
                 return expiredCache.products;
             }
+            
             throw error; // Relancer l'erreur si aucun cache n'est disponible
         } finally {
             this.isLoading = false;
         }
     }
 
-
     /**
      * Obtenir les métadonnées du cache
      */
     getMetadata() {
-        const cached = this.get(); // Utilise la logique de validation TTL
+        const cached = this.get();
         if (cached) {
             return cached.metadata;
         }
@@ -170,10 +172,10 @@ if (typeof window !== 'undefined') {
     // S'assurer que CONFIG est chargé avant d'instancier
     if (typeof CONFIG !== 'undefined') {
         window.productCache = new ProductCacheManager();
-        console.log('✅ Cache Manager instancié');
+        console.log('✅ Cache Manager instancié (VERSION SÉCURISÉE)');
     } else {
         console.error('❌ CONFIG non défini avant Cache Manager. Vérifiez l\'ordre des scripts.');
     }
 } else {
-     console.log('✅ Cache Manager chargé (environnement non-navigateur)');
+    console.log('✅ Cache Manager chargé (environnement non-navigateur)');
 }

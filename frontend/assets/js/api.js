@@ -1,6 +1,6 @@
 // ==========================================
-// Service API - Adapté pour Google Apps Script existant
-// VERSION OPTIMISÉE avec endpoint /home
+// Service API - VERSION SÉCURISÉE avec CSRF
+// Toutes les requêtes passent par le backend
 // ==========================================
 
 const apiService = {
@@ -13,41 +13,46 @@ const apiService = {
      */
     async getHomeProducts() {
         try {
-            // Vérifier que CONFIG est chargé
+            // Vérifier que CONFIG et csrfManager sont chargés
             if (typeof CONFIG === 'undefined') {
-                console.error('❌ CONFIG n\'est pas défini. Assurez-vous que config.js est chargé avant api.js');
+                console.error('❌ CONFIG n\'est pas défini');
                 throw new Error('Configuration non chargée');
             }
 
-            // Endpoint dédié ultra-rapide
-            const url = `${CONFIG.API.BASE_URL}?home=1&t=${Date.now()}`;
-            console.log('🏠 Requête API Home optimisée:', url);
+            if (typeof window.csrfManager === 'undefined') {
+                console.error('❌ csrfManager n\'est pas défini');
+                throw new Error('CSRF Manager non chargé');
+            }
+
+            const url = `${CONFIG.API.ENDPOINTS.PRODUCTS_HOME}?t=${Date.now()}`;
+            console.log('🏠 Requête API Home sécurisée:', url);
             
             const startTime = performance.now();
             
-            const response = await fetch(url, {
-                method: 'GET',
-                redirect: 'follow'
+            // ✅ Utiliser secureFetch au lieu de fetch
+            const response = await window.csrfManager.secureFetch(url, {
+                method: 'GET'
             });
             
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
             
-            const data = await response.json();
+            const result = await response.json();
             
             const endTime = performance.now();
             const loadTime = Math.round(endTime - startTime);
             
             console.log(`✅ Données Home reçues en ${loadTime}ms`);
-            console.log(`📦 ${data.items?.length || 0} produits (Petits Prix + Promos en stock)`);
+            console.log(`📦 ${result.data?.items?.length || 0} produits`);
             
             return {
                 success: true,
                 data: {
-                    products: data.items || [],
-                    updatedAt: data.stockUpdatedAt || data.updatedAt,
-                    loadTime: loadTime
+                    products: result.data?.items || [],
+                    updatedAt: result.data?.stockUpdatedAt || result.data?.updatedAt,
+                    loadTime: loadTime,
+                    cached: result.cached || false
                 }
             };
             
@@ -62,13 +67,18 @@ const apiService = {
      */
     async getProducts(filters = {}) {
         try {
-            // Vérifier que CONFIG est chargé
+            // Vérifier que CONFIG et csrfManager sont chargés
             if (typeof CONFIG === 'undefined') {
-                console.error('❌ CONFIG n\'est pas défini. Assurez-vous que config.js est chargé avant api.js');
+                console.error('❌ CONFIG n\'est pas défini');
                 throw new Error('Configuration non chargée');
             }
 
-            // Construire l'URL avec les paramètres pour votre Google Apps Script
+            if (typeof window.csrfManager === 'undefined') {
+                console.error('❌ csrfManager n\'est pas défini');
+                throw new Error('CSRF Manager non chargé');
+            }
+
+            // Construire l'URL avec les paramètres
             const params = new URLSearchParams();
             
             // Paramètre de recherche
@@ -85,31 +95,34 @@ const apiService = {
                 params.append('featured', '1');
             }
 
-            const url = `${CONFIG.API.BASE_URL}?${params.toString()}`;
-            console.log('📡 Requête API:', url);
+            const url = `${CONFIG.API.ENDPOINTS.PRODUCTS}?${params.toString()}`;
+            console.log('📡 Requête API sécurisée:', url);
             
-            const response = await fetch(url, {
-                method: 'GET',
-                redirect: 'follow'
+            const startTime = performance.now();
+            
+            // ✅ Utiliser secureFetch au lieu de fetch
+            const response = await window.csrfManager.secureFetch(url, {
+                method: 'GET'
             });
             
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
             
-            const data = await response.json();
-            console.log('✅ Données brutes reçues:', data);
-            console.log('🔍 Premier item brut:', data.items?.[0]);
+            const result = await response.json();
+            
+            const endTime = performance.now();
+            const loadTime = Math.round(endTime - startTime);
+            
+            console.log(`✅ Données reçues en ${loadTime}ms (cached: ${result.cached || false})`);
+            console.log('🔍 Premier item:', result.data?.items?.[0]);
             
             // Adapter le format de réponse pour le frontend
-            // Votre API retourne { items: [...], total: X, count: Y }
-            // Le frontend attend { success: true, data: { products: [...] } }
-            
             const adaptedData = {
                 success: true,
                 data: {
-                    products: (data.items || []).map(item => ({
-                        // Mapping des champs de votre API vers le format attendu
+                    products: (result.data?.items || []).map(item => ({
+                        // Mapping des champs de l'API vers le format attendu
                         identifiant: item.id,
                         libelle: item.libelle,
                         code_cip: item.cip,
@@ -117,7 +130,7 @@ const apiService = {
                         prix_final: item.prix_promo || item.prix,
                         stock: item.stock,
                         fournisseur: item.marque,
-                        categorie: 'Général', // Pas de catégorie dans votre API
+                        categorie: 'Général',
                         image_url: item.image_url || CONFIG.IMAGE.PLACEHOLDER,
                         
                         // Promotion
@@ -128,31 +141,31 @@ const apiService = {
                         mise_en_avant: item.featured ? 1 : 0,
                         
                         // Sur ordonnance
-                        tableau: item.ordonnance ? 1 : null,
+                        tableau: item.ordonnance ? 'Liste I' : '',
                         
-                        // Disponibilité
-                        disponibilite: item.disponibilite,
-                        availability: item.availability,
-                        availability_code: item.availability_code,
-                        
-                        // Données brutes pour référence
-                        _raw: item
+                        // Données complètes de l'item original
+                        ...item
                     })),
-                    pagination: {
-                        total: data.total || 0,
-                        count: data.count || 0,
-                        offset: data.offset || 0,
-                        limit: data.limit || 1000
-                    }
+                    total: result.data?.total || 0,
+                    count: result.data?.count || 0,
+                    cached: result.cached || false,
+                    cacheAge: result.cacheAge || 0,
+                    loadTime: loadTime
                 }
             };
             
-            console.log('✅ Données adaptées:', adaptedData);
-            console.log('🔍 Premier produit adapté:', adaptedData.data.products?.[0]);
+            console.log(`📊 Total produits: ${adaptedData.data.products.length}`);
             return adaptedData;
             
         } catch (error) {
-            console.error('Erreur API getProducts:', error);
+            console.error('❌ Erreur API getProducts:', error);
+            
+            // Gestion spécifique erreur CSRF
+            if (error.message.includes('403') || error.message.includes('CSRF')) {
+                alert(CONFIG.MESSAGES.ERROR.CSRF);
+                window.location.reload();
+            }
+            
             throw error;
         }
     },
@@ -162,23 +175,27 @@ const apiService = {
      */
     async getBrands() {
         try {
-            const url = `${CONFIG.API.BASE_URL}?brands=1`;
+            if (typeof window.csrfManager === 'undefined') {
+                console.error('❌ csrfManager n\'est pas défini');
+                throw new Error('CSRF Manager non chargé');
+            }
+
+            const url = CONFIG.API.ENDPOINTS.BRANDS;
             console.log('📡 Requête API brands:', url);
             
-            const response = await fetch(url, {
-                method: 'GET',
-                redirect: 'follow'
+            const response = await window.csrfManager.secureFetch(url, {
+                method: 'GET'
             });
             
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
             
-            const data = await response.json();
-            return data.brands || [];
+            const result = await response.json();
+            return result.data || [];
             
         } catch (error) {
-            console.error('Erreur API getBrands:', error);
+            console.error('❌ Erreur API getBrands:', error);
             throw error;
         }
     },
@@ -188,25 +205,29 @@ const apiService = {
      */
     async getProductById(id) {
         try {
+            if (typeof window.csrfManager === 'undefined') {
+                console.error('❌ csrfManager n\'est pas défini');
+                throw new Error('CSRF Manager non chargé');
+            }
+
             // Recherche par ID
-            const url = `${CONFIG.API.BASE_URL}?q=${id}&limit=1`;
+            const url = `${CONFIG.API.ENDPOINTS.PRODUCTS}?q=${id}&limit=1`;
             console.log('📡 Requête API:', url);
             
-            const response = await fetch(url, {
-                method: 'GET',
-                redirect: 'follow'
+            const response = await window.csrfManager.secureFetch(url, {
+                method: 'GET'
             });
             
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
             
-            const data = await response.json();
+            const result = await response.json();
             
-            if (data.items && data.items.length > 0) {
+            if (result.data?.items && result.data.items.length > 0) {
                 return {
                     success: true,
-                    data: data.items[0]
+                    data: result.data.items[0]
                 };
             }
             
@@ -216,16 +237,15 @@ const apiService = {
             };
             
         } catch (error) {
-            console.error('Erreur API getProductById:', error);
+            console.error('❌ Erreur API getProductById:', error);
             throw error;
         }
     },
 
     /**
-     * Récupérer les catégories (non disponible dans votre API)
+     * Récupérer les catégories (non disponible dans l'API)
      */
     async getCategories() {
-        // Votre API n'a pas de catégories, on retourne une liste vide
         return {
             success: true,
             data: []
@@ -238,4 +258,4 @@ if (typeof window !== 'undefined') {
     window.apiService = apiService;
 }
 
-console.log('✅ API Service chargé (version optimisée avec endpoint /home)');
+console.log('✅ API Service chargé (VERSION SÉCURISÉE avec CSRF)');

@@ -66,25 +66,21 @@ const availabilityBadge = (code, dispo) => {
 
 // --- API ---
 async function fetchBrands() {
-    if (!API_URL) {
-        console.error("fetchBrands: API_URL n'est pas configuré.");
-        return [];
-    }
-    const url = new URL(API_URL);
-    url.searchParams.set('brands', '1');
-    url.searchParams.set('t', Date.now());
-
     try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Erreur HTTP ${res.status} lors de la récupération des marques.`);
-        const data = await res.json();
-
-        if (!Array.isArray(data.brands)) {
-             console.warn("fetchBrands: La réponse de l'API ne contient pas un tableau 'brands'.", data);
-             return [];
+        // ✅ NOUVEAU : Utiliser apiService au lieu de fetch direct
+        if (typeof window.apiService === 'undefined') {
+            console.error("fetchBrands: apiService n'est pas disponible.");
+            return [];
         }
 
-        return data.brands
+        const brands = await window.apiService.getBrands();
+
+        if (!Array.isArray(brands)) {
+            console.warn("fetchBrands: La réponse de l'API ne contient pas un tableau.", brands);
+            return [];
+        }
+
+        return brands
             .filter(b => b && typeof b.label === 'string')
             .map(b => ({
                 label: b.label,

@@ -181,13 +181,28 @@ app.use('/api/prescription', strictApiLimiter, protectRoute, prescriptionRoutes)
 const cartRoutes = require('./routes/cart');
 app.use('/api/cart', moderateApiLimiter, protectRoute, cartRoutes);
 
+// Test de diagnostic
+app.use('/api/products', (req, res, next) => {
+  console.log('🔍 TEST: Route /api/products appelée');
+  console.log('🔍 Headers:', req.headers);
+  next();
+});
+
+const productsRoutes = require('./routes/products');
+app.use('/api/products', moderateApiLimiter, protectRoute, productsRoutes);  // ← Cette ligne
+
 // ============================================
 // SERVEUR FICHIERS FRONTEND
 // ============================================
 const frontendDir = path.join(__dirname, '../frontend');
 app.use(express.static(frontendDir));
 
-app.get('*', (req, res) => {
+// ⚠️ IMPORTANT : Catch-all SEULEMENT pour les routes non-API
+app.get('*', (req, res, next) => {
+  // Si c'est une route API, ne pas intercepter
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
   res.sendFile(path.join(frontendDir, 'index.html'));
 });
 

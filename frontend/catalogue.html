@@ -332,12 +332,15 @@
         </div>
     </div>
 
-    <script src="assets/js/config.js"></script>
-    <script src="assets/js/cache-manager.js"></script>
-    <script src="assets/js/cart-v2.js"></script>
-    <script src="assets/js/catalogue.js"></script>
-    <script src="assets/js/cookie-config.js"></script>
-    <script src="assets/js/script.js" defer></script>
+  <!-- Ordre CORRECT des scripts pour catalogue.html -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/csrf-manager.js"></script>        <!-- ← AJOUTER ICI -->
+<script src="assets/js/cache-manager.js"></script>
+<script src="assets/js/api.js"></script>                 <!-- Si utilisé -->
+<script src="assets/js/cart-v2.js"></script>
+<script src="assets/js/catalogue.js"></script>
+<script src="assets/js/cookie-config.js"></script>
+<script src="assets/js/script.js" defer></script>
 </body>
 
 </html>

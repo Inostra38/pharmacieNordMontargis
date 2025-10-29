@@ -1,11 +1,23 @@
 // ==========================================
 // Configuration - Pharmacie Nord Montargis
+// VERSION SÉCURISÉE - Proxy via backend
 // ==========================================
 
 const CONFIG = {
-    // API Google Apps Script
+    // API Backend (Proxy sécurisé)
     API: {
-        BASE_URL: 'https://script.google.com/macros/s/AKfycbyeUXfJ0PA51tiSVNRr15AiVJJLBcHaYZl7cFT0L9rJ0WWzKzVwPzpPzL-NqR1H7iXp/exec'
+        // ✅ NOUVEAU : Toutes les requêtes passent par le backend
+        BASE_URL: '/api/products',
+        CSRF_TOKEN_URL: '/api/csrf-token',
+        
+        // Endpoints spécifiques
+        ENDPOINTS: {
+            PRODUCTS: '/api/products',
+            PRODUCTS_HOME: '/api/products/home',
+            BRANDS: '/api/products/brands',
+            CART: '/api/cart',
+            PRESCRIPTION: '/api/prescription'
+        }
     },
 
     // Images (placeholder par défaut)
@@ -22,6 +34,12 @@ const CONFIG = {
         RANDOM_LIMIT: 150
     },
 
+    // Cache
+    CACHE: {
+        TTL: 10 * 60 * 1000, // 10 minutes (correspond au cache serveur)
+        ENABLED: true
+    },
+
     // Messages
     MESSAGES: {
         SUCCESS: {
@@ -34,7 +52,8 @@ const CONFIG = {
             SERVER: 'Erreur serveur. Veuillez réessayer plus tard.',
             NOT_FOUND: 'Ressource non trouvée.',
             NO_PRODUCTS: 'Aucun produit trouvé.',
-            GENERIC: 'Une erreur est survenue. Veuillez réessayer.'
+            GENERIC: 'Une erreur est survenue. Veuillez réessayer.',
+            CSRF: 'Votre session a expiré. Veuillez rafraîchir la page.'
         }
     }
 };
@@ -45,5 +64,6 @@ if (typeof window !== 'undefined') {
 }
 
 // Log de confirmation
-console.log('✅ Configuration chargée');
-console.log('📡 API:', CONFIG.API.BASE_URL);
+console.log('✅ Configuration chargée (VERSION SÉCURISÉE)');
+console.log('📡 API Backend:', CONFIG.API.BASE_URL);
+console.log('🛡️ Protection CSRF activée');

@@ -38,25 +38,43 @@ function verifyOrigin(req, res, next) {
     'https://www.pharmacienordmontargis.fr'
   ];
   
-  // Vérifier l'origine
-  if (origin) {
-    const isAllowed = allowedOrigins.some(allowed => 
-      origin.startsWith(allowed)
-    );
-    
-    if (!isAllowed) {
-      console.error('🚨 CSRF - Origine non autorisée:', {
-        origin,
-        ip: req.ip,
-        path: req.path,
-        timestamp: new Date().toISOString()
-      });
-      
-      return res.status(403).json({
-        error: 'Accès refusé',
-        message: 'Origine non autorisée'
-      });
+  // ✅ NOUVEAU : Bloquer si pas d'origine (sauf pour /api/csrf-token)
+  if (!origin) {
+    // Autoriser seulement pour la route de génération du token CSRF
+    if (req.path === '/api/csrf-token') {
+      return next();
     }
+    
+    console.error('🚨 CSRF - Requête sans origine bloquée:', {
+      ip: req.ip,
+      path: req.path,
+      userAgent: req.get('user-agent'),
+      timestamp: new Date().toISOString()
+    });
+    
+    return res.status(403).json({
+      error: 'Accès refusé',
+      message: 'En-tête Origin ou Referer requis'
+    });
+  }
+  
+  // Vérifier l'origine
+  const isAllowed = allowedOrigins.some(allowed => 
+    origin.startsWith(allowed)
+  );
+  
+  if (!isAllowed) {
+    console.error('🚨 CSRF - Origine non autorisée:', {
+      origin,
+      ip: req.ip,
+      path: req.path,
+      timestamp: new Date().toISOString()
+    });
+    
+    return res.status(403).json({
+      error: 'Accès refusé',
+      message: 'Origine non autorisée'
+    });
   }
   
   next();
