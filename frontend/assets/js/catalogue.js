@@ -1,5 +1,5 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = =
-// Catalogue - Version Sans Catégories
+// Catalogue - Version Sans Catégories - BUG FIX: CSP Error (onclick inline)
 // = = = = = = = = = = = = = = = = = = = = = = = = =
 
 // Vérifie si CONFIG est défini, sinon log une erreur claire.
@@ -12,13 +12,11 @@ const API_URL = CONFIG ? CONFIG.API.BASE_URL : ''; // Utilise CONFIG ou une cha�
 const state = {
     query: '',
     brand: '',
-    // category: '', // Supprimé
     showStock: false,
     displayMode: 'tous'
 };
 let ALL_PRODUCTS = [];
 let BRANDS = [];
-// let CATEGORIES = new Set(); // Supprimé
 
 // --- Utilitaires ---
 const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -67,7 +65,6 @@ const availabilityBadge = (code, dispo) => {
 // --- API ---
 async function fetchBrands() {
     try {
-        // ✅ NOUVEAU : Utiliser apiService au lieu de fetch direct
         if (typeof window.apiService === 'undefined') {
             console.error("fetchBrands: apiService n'est pas disponible.");
             return [];
@@ -112,8 +109,8 @@ function renderProduct(item) {
     const promoNorm = norm(promoLabel);
     const lotSize = item.lot_size;
     const lotTotal = item.lot_total;
-    const basePrice = item.prix; // Prix avant promo
-    const finalUnitPrice = item.prix_promo || item.prix; // Prix unitaire final affiché
+    const basePrice = item.prix;
+    const finalUnitPrice = item.prix_promo || item.prix;
 
     let badges = '';
     if (requiresPrescription) badges += '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 dark:bg-rose-900 dark:text-rose-300">📋 Ordonnance</span>';
@@ -121,7 +118,7 @@ function renderProduct(item) {
 
     let priceHTML = '';
     let lotHTML = '';
-    // Construction de l'affichage du prix (identique à avant)
+    
     if (typeof lotSize === 'number' && lotSize > 1 && typeof lotTotal === 'number') {
         const isPrixPar = promoNorm.includes('prix par');
         const lotPrice = `<span class="price-promo">${formatPrice(lotTotal)}</span>`;
@@ -138,14 +135,11 @@ function renderProduct(item) {
 
     let buttonHtml = '';
     if (requiresPrescription) {
-        // Lien si ordonnance requise
         buttonHtml = `<a href="secure.ordonnance.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2" title="Ce produit nécessite une ordonnance. Cliquez pour envoyer la vôtre."><span class="material-symbols-outlined">upload_file</span> Envoyer l'ordonnance</a>`;
     } else {
-        // Bouton Réserver avec toutes les data-* nécessaires
         buttonHtml = `<button class="reserve-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2" data-id="${item.id}" data-name="${escapeHtml(item.libelle)}" data-price="${finalUnitPrice}" data-base-price="${basePrice}" data-cip="${item.cip || ''}" data-promo-libelle="${escapeHtml(promoLabel)}" data-lot-size="${lotSize || ''}" data-lot-total="${lotTotal || ''}"><span class="material-symbols-outlined">shopping_cart</span> Réserver</button>`;
     }
 
-    // Rendu HTML final de la carte
     return `
         <div class="product-card bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden">
             <div class="p-5">
@@ -167,23 +161,17 @@ function renderGrid(items) {
     const grid = document.getElementById('productsGrid');
     const resultsCountEl = document.getElementById('resultsCount');
     if (!grid || !resultsCountEl) {
-         console.error("Élément #productsGrid ou #resultsCount introuvable pour renderGrid.");
-         return;
+        console.error("Élément #productsGrid ou #resultsCount introuvable pour renderGrid.");
+        return;
     }
 
-    // Assure que 'items' est un tableau avant de mapper
     grid.innerHTML = Array.isArray(items) ? items.map(item => renderProduct(item)).join('') : '';
 
-    // Attacher les événements APRES la génération du HTML
     grid.querySelectorAll('.reserve-btn').forEach(btn => {
-        // Nettoyer anciens listeners avant d'ajouter le nouveau
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
 
-        newBtn.addEventListener('click', async function() { // Utiliser function() pour 'this'
-            // console.log('🛒 Clic sur Réserver (Catalogue)');
-
-            // Récupère toutes les données promo depuis data-*
+        newBtn.addEventListener('click', async function() {
             const product = {
                 id: this.dataset.id,
                 name: this.dataset.name,
@@ -193,10 +181,8 @@ function renderGrid(items) {
                 promoLibelle: this.dataset.promoLibelle,
                 lotSize: this.dataset.lotSize ? parseInt(this.dataset.lotSize) : null,
                 lotTotal: this.dataset.lotTotal ? parseFloat(this.dataset.lotTotal) : null,
-                requiresPrescription: false // Logique gérée avant
+                requiresPrescription: false
             };
-
-            // console.log('Produit à ajouter (Catalogue):', product);
 
             if (!window.cartManager) {
                 console.error('❌ cartManager non trouvé ! Le panier n\'est pas initialisé.');
@@ -205,10 +191,8 @@ function renderGrid(items) {
             }
 
             try {
-                window.cartManager.addItem(product); // Envoie l'objet complet au panier
-                // console.log('✅ Produit ajouté au panier (Catalogue)');
+                window.cartManager.addItem(product);
 
-                // Feedback visuel
                 const originalHTML = this.innerHTML;
                 this.innerHTML = '<span class="material-symbols-outlined">check</span> Réservé !';
                 this.classList.add('bg-green-600', 'hover:bg-green-700');
@@ -216,12 +200,11 @@ function renderGrid(items) {
                 this.disabled = true;
 
                 setTimeout(() => {
-                    // Vérifier si le bouton existe toujours avant de restaurer
                     if(document.body.contains(this)) {
-                         this.innerHTML = originalHTML;
-                         this.classList.remove('bg-green-600', 'hover:bg-green-700');
-                         this.classList.add('bg-teal-600', 'hover:bg-teal-700');
-                         this.disabled = false;
+                        this.innerHTML = originalHTML;
+                        this.classList.remove('bg-green-600', 'hover:bg-green-700');
+                        this.classList.add('bg-teal-600', 'hover:bg-teal-700');
+                        this.disabled = false;
                     }
                 }, 1500);
 
@@ -232,11 +215,8 @@ function renderGrid(items) {
         });
     });
 
-    // Mettre à jour le compteur de résultats
     resultsCountEl.textContent = Array.isArray(items) ? items.length : 0;
-    // console.log(`✅ ${Array.isArray(items) ? items.length : 0} produits affichés. Événements attachés.`);
 }
-
 
 // --- Ordre d'affichage ---
 function getInitialProducts() {
@@ -246,19 +226,16 @@ function getInitialProducts() {
     const used = new Set();
     const productKey = p => p.id || p.cip;
 
-    // Priorité 1: Featured
     ALL_PRODUCTS.filter(p => p && p.featured).forEach(p => {
         const key = productKey(p);
         if (key && !used.has(key)) { items.push(p); used.add(key); }
     });
 
-    // Priorité 2: Petits Prix
     ALL_PRODUCTS.filter(p => p && norm(p.promo_libelle || '') === 'petits prix').forEach(p => {
         const key = productKey(p);
         if (key && !used.has(key)) { items.push(p); used.add(key); }
     });
 
-    // Priorité 3: Autres Promos
     ALL_PRODUCTS.filter(p => {
         if (!p) return false;
         const key = productKey(p);
@@ -272,7 +249,6 @@ function getInitialProducts() {
         if (key && !used.has(key)) { items.push(p); used.add(key); }
     });
 
-    // Priorité 4: Aléatoires (max 150)
     const remaining = ALL_PRODUCTS.filter(p => p && !used.has(productKey(p)));
     const random = shuffle(remaining).slice(0, 150);
     random.forEach(p => {
@@ -283,7 +259,7 @@ function getInitialProducts() {
     return items;
 }
 
-// --- Filtres (Sans Catégories) ---
+// --- Filtres ---
 function applyFilters() {
     if (!Array.isArray(ALL_PRODUCTS)) {
         console.error("applyFilters: ALL_PRODUCTS n'est pas prêt.");
@@ -291,39 +267,37 @@ function applyFilters() {
     }
 
     let items = [];
-    const hasActiveFilters = (state.query && state.query.length >= 2) || state.brand || state.showStock; // state.category retiré
+    const hasActiveFilters = (state.query && state.query.length >= 2) || state.brand || state.showStock;
 
     if (state.displayMode === 'tous') {
         items = hasActiveFilters ? [...ALL_PRODUCTS] : getInitialProducts();
     } else {
-        items = [...ALL_PRODUCTS]; // Commencer avec tous pour modes spéciaux
+        items = [...ALL_PRODUCTS];
         if (state.displayMode === 'misEnAvant') items = items.filter(p => p && p.featured);
         else if (state.displayMode === 'promotions') items = items.filter(p => p && ( (typeof p.prix_promo === 'number' && Number.isFinite(p.prix_promo)) || (typeof p.lot_size === 'number' && p.lot_size > 1) || !!(p.promo_libelle || '').trim() ));
         else if (state.displayMode === 'petitsPrix') items = items.filter(p => p && norm(p.promo_libelle || '') === 'petits prix');
     }
 
-    // Appliquer filtres restants
     if (state.query && state.query.length >= 2) {
         const q = norm(state.query);
         items = items.filter(it => it && norm(`${it.libelle} ${it.marque} ${it.cip}`).includes(q));
     }
-    // Filtre catégorie retiré
     if (state.brand) items = items.filter(it => it && norm(it.marque || '') === norm(state.brand));
     if (state.showStock) items = items.filter(it => it && (it.availability_code === 'stock' || norm(it.disponibilite || '').includes('oui')));
 
-    renderGrid(items); // Mettre à jour la grille
+    renderGrid(items);
 }
 
 function resetFilters() {
-    state.query = ''; state.brand = ''; // state.category retiré
-    state.showStock = false; state.displayMode = 'tous';
+    state.query = ''; 
+    state.brand = '';
+    state.showStock = false; 
+    state.displayMode = 'tous';
 
-    // Réinitialiser UI
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
     const labFilter = document.getElementById('labFilter');
     if (labFilter) labFilter.value = '';
-    // Reset categoryFilter retiré
     const stockFilter = document.getElementById('stockFilter');
     if (stockFilter) stockFilter.checked = false;
     const tousRadio = document.querySelector('input[name="displayMode"][value="tous"]');
@@ -333,8 +307,7 @@ function resetFilters() {
     console.log('🔄 Filtres réinitialisés.');
 }
 
-
-// --- Init (Sans Catégories) ---
+// --- Init ---
 async function init() {
     console.log('🚀 Initialisation catalogue (sans catégories)');
 
@@ -347,7 +320,6 @@ async function init() {
         return;
     }
 
-    // Afficher Skeleton
     loading.classList.remove('hidden');
     grid.innerHTML = Array(9).fill('').map(() =>
         `<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 animate-pulse">
@@ -355,7 +327,7 @@ async function init() {
             <div class="h-3 rounded bg-gray-200 dark:bg-gray-700 w-full mb-2"></div>
             <div class="h-3 rounded bg-gray-200 dark:bg-gray-700 w-2/3"></div>
         </div>`
-    ).join(''); // Amélioration skeleton avec animate-pulse
+    ).join('');
 
     try {
         if (!window.productCache) throw new Error('productCache non disponible!');
@@ -363,33 +335,25 @@ async function init() {
         if (!Array.isArray(ALL_PRODUCTS)) ALL_PRODUCTS = [];
         console.log(`✅ ${ALL_PRODUCTS.length} produits chargés.`);
 
-        // Charger Marques
         BRANDS = await fetchBrands();
-        if (!Array.isArray(BRANDS)) BRANDS = []; // Sécurité
+        if (!Array.isArray(BRANDS)) BRANDS = [];
         console.log(`✅ ${BRANDS.length} marques chargées.`);
 
-        // Extraction Catégories supprimée
-
-        // Remplir Dropdown Laboratoires
         const labFilter = document.getElementById('labFilter');
         if (labFilter) {
             labFilter.innerHTML = '<option value="">Tous les laboratoires</option>';
             BRANDS.sort((a, b) => a.label.localeCompare(b.label))
                   .forEach(b => {
                       const opt = document.createElement('option');
-                      opt.value = b.label; // Utilise label comme valeur
+                      opt.value = b.label;
                       opt.textContent = `${b.label} (${b.count})`;
                       labFilter.appendChild(opt);
                   });
         }
 
-        // Remplissage dropdown Catégories supprimé
-
-        // Afficher Produits Initiaux
         const initialProducts = getInitialProducts();
         renderGrid(initialProducts);
 
-        // Afficher Date Mise à Jour
         const metadata = window.productCache.getMetadata();
         updateTimeEl.textContent = (metadata && metadata.updatedAt) ? `Mise à jour : ${formatDate(metadata.updatedAt)}` : 'Date indisponible';
 
@@ -397,12 +361,21 @@ async function init() {
 
     } catch (error) {
         console.error('❌ Erreur initialisation catalogue:', error);
-        grid.innerHTML = // Message d'erreur HTML
+        
+        // ✅ FIX: Suppression du onclick inline, création d'un ID et attachement de l'événement
+        grid.innerHTML = 
         `<div class="col-span-full text-center py-12">
             <p class="text-red-500 text-xl font-bold mb-2">❌ Erreur de chargement du catalogue</p>
             <p class="text-gray-600 dark:text-gray-400">${error.message || 'Une erreur inconnue est survenue.'}</p>
-            <button onclick="location.reload()" class="mt-4 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700">Réessayer</button>
+            <button id="retryButton" class="mt-4 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700">Réessayer</button>
         </div>`;
+        
+        // ✅ Attacher l'événement après la création du HTML
+        const retryButton = document.getElementById('retryButton');
+        if (retryButton) {
+            retryButton.addEventListener('click', () => location.reload());
+        }
+        
     } finally {
         loading.classList.add('hidden');
     }
@@ -412,31 +385,27 @@ async function init() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Catalogue.js: DOMContentLoaded');
 
-    // Vérifier dépendances
     if (typeof CONFIG === 'undefined' || !window.productCache || !window.cartManager) {
-         console.error("ERREUR: Dépendances manquantes (CONFIG, productCache, ou cartManager). L'initialisation est annulée.");
-         const grid = document.getElementById('productsGrid');
-         if(grid) grid.innerHTML = '<p class="col-span-full text-center text-red-500 font-bold py-10">Erreur critique lors du chargement. Veuillez recharger la page.</p>';
-         return;
+        console.error("ERREUR: Dépendances manquantes (CONFIG, productCache, ou cartManager). L'initialisation est annulée.");
+        const grid = document.getElementById('productsGrid');
+        if(grid) grid.innerHTML = '<p class="col-span-full text-center text-red-500 font-bold py-10">Erreur critique lors du chargement. Veuillez recharger la page.</p>';
+        return;
     }
 
-    init(); // Lancer l'initialisation
+    init();
 
-    // --- Attacher les listeners ---
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         let searchTimeout;
         searchInput.addEventListener('input', (e) => {
-             clearTimeout(searchTimeout);
-             searchTimeout = setTimeout(() => { state.query = e.target.value.trim(); applyFilters(); }, 300);
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => { state.query = e.target.value.trim(); applyFilters(); }, 300);
         });
     } else { console.warn('Element #searchInput non trouvé'); }
 
     const labFilterEl = document.getElementById('labFilter');
     if (labFilterEl) labFilterEl.addEventListener('change', (e) => { state.brand = e.target.value; applyFilters(); });
     else console.warn('Element #labFilter non trouvé');
-
-    // Listener categoryFilterEl supprimé
 
     const stockFilterEl = document.getElementById('stockFilter');
     if (stockFilterEl) stockFilterEl.addEventListener('change', (e) => { state.showStock = e.target.checked; applyFilters(); });
@@ -451,7 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resetFiltersBtnEl) resetFiltersBtnEl.addEventListener('click', resetFilters);
     else console.warn('Element #resetFiltersBtn non trouvé');
 
-    // --- Gestion du drawer panier ---
     const cartBtn = document.getElementById('cartButton');
     const cartDrawer = document.getElementById('cartDrawer');
     const cartOverlay = document.getElementById('cartOverlay');
@@ -471,8 +439,8 @@ document.addEventListener('DOMContentLoaded', () => {
             cartOverlay.classList.add('hidden');
         });
     } else {
-         console.warn('Un ou plusieurs éléments du drawer panier sont manquants.');
+        console.warn('Un ou plusieurs éléments du drawer panier sont manquants.');
     }
 });
 
-console.log('✅ Catalogue chargé (vSansCategories)');
+console.log('✅ Catalogue chargé (vSansCategories - BUG FIX CSP)');
