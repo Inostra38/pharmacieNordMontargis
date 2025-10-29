@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cartItems.length === 0) {
             listContainer.innerHTML = '<p class="text-center py-4 text-gray-500 dark:text-gray-400">Votre panier est vide. <a href="catalogue.html" class="text-teal-500 hover:underline">Retour au catalogue</a>.</p>';
             totalElement.textContent = '0,00 €';
-            if(checkoutForm) checkoutForm.style.display = 'none';
-            if(submitButton) {
-                 submitButton.disabled = true;
-                 submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+            if (checkoutForm) checkoutForm.style.display = 'none';
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
             }
             return;
         }
@@ -42,24 +42,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checkoutForm) {
             checkoutForm.addEventListener('submit', handleFormSubmit);
         }
-        // MODIFICATION : Suppression du listener checkbox car la checkbox n'existe plus
     }
 
-    if (window.cartManager) {
-        initValidationPage();
-    } else {
-        // console.log('🛒 Validation.js : en attente de "cartManagerReady"...');
-        document.addEventListener('cartManagerReady', initValidationPage);
+    // Attendre que CSRF Manager ET Cart Manager soient prêts
+    function waitForManagers() {
+        if (window.csrfManager && window.cartManager) {
+            initValidationPage();
+        } else {
+            setTimeout(waitForManagers, 100); // Réessayer après 100ms
+        }
     }
+
+    waitForManagers();
 
     function renderCartSummary() {
         if (!listContainer || !totalElement) {
-             console.error("Éléments #cart-summary-list ou #cart-summary-total non trouvés !");
-             return;
+            console.error("Éléments #cart-summary-list ou #cart-summary-total non trouvés !");
+            return;
         }
         const formatPrice = (price) => {
-             if (typeof price !== 'number' || !Number.isFinite(price)) { return 'N/A'; }
-             return price.toFixed(2).replace('.', ',') + ' €';
+            if (typeof price !== 'number' || !Number.isFinite(price)) { return 'N/A'; }
+            return price.toFixed(2).replace('.', ',') + ' €';
         };
 
         // console.log('DEBUG validation.js - Items à afficher dans le résumé:', cartItems);
@@ -75,19 +78,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const lineBaseTotal = quantity * basePrice;
 
             let linePromoTotal = 0;
-             if (typeof lotSize === 'number' && lotSize > 1 && typeof lotTotal === 'number' && quantity >= lotSize) {
-                 const numLots = Math.floor(quantity / lotSize);
-                 const remainingQty = quantity % lotSize;
-                 linePromoTotal = (numLots * lotTotal) + (remainingQty * unitPrice);
+            if (typeof lotSize === 'number' && lotSize > 1 && typeof lotTotal === 'number' && quantity >= lotSize) {
+                const numLots = Math.floor(quantity / lotSize);
+                const remainingQty = quantity % lotSize;
+                linePromoTotal = (numLots * lotTotal) + (remainingQty * unitPrice);
             } else if ((promoText.includes('sur le 2') || promoText.includes('sur le deux')) && basePrice > 0) {
                 const discountMatch = promoText.match(/(\d+)[\s%]*%/);
                 const discountPercent = discountMatch ? parseInt(discountMatch[1]) / 100 : 0;
-                 if (discountPercent > 0) {
+                if (discountPercent > 0) {
                     const numPairs = Math.floor(quantity / 2);
                     const remainingQty = quantity % 2;
                     const discountedPrice = basePrice * (1 - discountPercent);
                     linePromoTotal = (numPairs * (basePrice + discountedPrice)) + (remainingQty * basePrice);
-                 } else { linePromoTotal = quantity * unitPrice; }
+                } else { linePromoTotal = quantity * unitPrice; }
             } else {
                 linePromoTotal = quantity * unitPrice;
             }
@@ -107,12 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let lineTotalHtml = '';
             if (showLineBaseTotalCrossed) {
-                 lineTotalHtml = `
+                lineTotalHtml = `
                     <span class="line-through text-gray-500 dark:text-gray-400 text-sm">${formatPrice(lineBaseTotal)}</span>
                     <span class="font-bold text-red-600 dark:text-red-400 ml-1">${formatPrice(linePromoTotal)}</span>
                  `;
             } else {
-                 lineTotalHtml = `<span class="font-semibold text-gray-800 dark:text-white">${formatPrice(linePromoTotal)}</span>`;
+                lineTotalHtml = `<span class="font-semibold text-gray-800 dark:text-white">${formatPrice(linePromoTotal)}</span>`;
             }
 
             return `
@@ -138,56 +141,58 @@ document.addEventListener('DOMContentLoaded', () => {
         // console.log('DEBUG validation.js - Affichage du total final mis à jour.');
     }
 
-    // MODIFICATION : Fonction toggleEmailRequirement() supprimée car la checkbox n'existe plus
-
     async function handleFormSubmit(event) {
         event.preventDefault();
-        if(!submitButton || !checkoutForm) return;
+        if (!submitButton || !checkoutForm) return;
 
         submitButton.disabled = true;
         submitButton.innerHTML = `<div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div> Envoi en cours...`;
         showError('');
 
         try {
-            const formData = new FormData(checkoutForm);
+            // ✅ Collecte des données du formulaire
+            const formElement = event.target;
             const dataToSend = {
-                name: formData.get('name'),
-                phone: formData.get('phone'),          // MODIFICATION : Ajout du téléphone
-                email: formData.get('email'),
-                message: formData.get('message'),
-                sendConfirmation: true,                // MODIFICATION : Toujours true maintenant
+                name: formElement.name.value,
+                phone: formElement.phone.value,
+                email: formElement.email.value,
+                message: formElement.message.value,
+                sendConfirmation: true,
                 cart: cartItems,
                 total: cartTotal
             };
 
-            // MODIFICATION : Ajout validation téléphone + modification validation email
+            // ✅ Validation des champs obligatoires
             if (!dataToSend.name) throw new Error("Le nom complet est requis.");
             if (!dataToSend.phone) throw new Error("Le numéro de téléphone est requis.");
             if (!dataToSend.email) throw new Error("L'adresse e-mail est requise.");
 
-            const response = await fetch(API_ENDPOINT, {
+            // ✅ Utiliser secureFetch avec le bon format
+            const response = await window.csrfManager.secureFetch(API_ENDPOINT, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataToSend),
+                body: JSON.stringify(dataToSend)
             });
 
             const result = await response.json();
-            if (!response.ok) throw new Error(result.message || 'Une erreur inconnue est survenue lors de l\'envoi.');
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'Une erreur inconnue est survenue lors de l\'envoi.');
+            }
 
             showSuccess();
 
         } catch (error) {
             console.error('Erreur lors de la réservation:', error);
             showError(`❌ Erreur : ${error.message}`);
-            submitButton.disabled = false; // Réactiver seulement en cas d'erreur
+            submitButton.disabled = false;
             submitButton.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true">lock</span> <span>Confirmer ma réservation</span>`;
         }
     }
 
     function showSuccess() {
         if (window.cartManager) window.cartManager.clear();
-        if(validationContainer) validationContainer.classList.add('hidden');
-        if(successContainer) successContainer.classList.remove('hidden');
+        if (validationContainer) validationContainer.classList.add('hidden');
+        if (successContainer) successContainer.classList.remove('hidden');
         window.scrollTo(0, 0);
     }
 

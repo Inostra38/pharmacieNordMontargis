@@ -2,11 +2,25 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const path = require('path');
 
+// Validation environnement
+const { validateEnv, checkDefaultValues } = require('./config/env-validator');
+const config = validateEnv();
+checkDefaultValues();
+
+// Import CSRF Protection
+const { 
+  csrfProtection,
+  protectRoute, 
+  handleCsrfError, 
+  getCsrfToken 
+} = require('./middleware/csrf-protection');
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.port;
 
 // ============================================
 // 🛡️ CONFIGURATION SÉCURITÉ
@@ -46,6 +60,7 @@ app.use(helmet({
       connectSrc: [
         "'self'",
         "https://www.google-analytics.com",
+        "https://region1.google-analytics.com",
         "https://script.google.com",
         "https://script.googleusercontent.com"
       ],
@@ -86,10 +101,14 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'CSRF-Token', 'X-CSRF-Token']
 };
 
 app.use(cors(corsOptions));
+
+// Cookie parser (requis pour CSRF)
+app.use(cookieParser());
+
 app.disable('x-powered-by');
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -147,13 +166,20 @@ const moderateApiLimiter = rateLimit({
 });
 
 // ============================================
-// ROUTES API
+// ✅ ROUTE CSRF TOKEN (csrfProtection uniquement)
+// ============================================
+// Cette route génère un token CSRF - elle a BESOIN de csrfProtection
+app.get('/api/csrf-token', csrfProtection, getCsrfToken);
+
+// ============================================
+// 🔒 ROUTES API PROTÉGÉES (protectRoute = origin + csrf)
 // ============================================
 
 const prescriptionRoutes = require('./routes/prescription');
-app.use('/api/prescription', strictApiLimiter, prescriptionRoutes);
+app.use('/api/prescription', strictApiLimiter, protectRoute, prescriptionRoutes);
+
 const cartRoutes = require('./routes/cart');
-app.use('/api/cart', moderateApiLimiter, cartRoutes);
+app.use('/api/cart', moderateApiLimiter, protectRoute, cartRoutes);
 
 // ============================================
 // SERVEUR FICHIERS FRONTEND
@@ -168,6 +194,11 @@ app.get('*', (req, res) => {
 // ============================================
 // GESTION D'ERREURS
 // ============================================
+
+// Gestionnaire CSRF (doit être AVANT le gestionnaire général)
+app.use(handleCsrfError);
+
+// Gestionnaire général
 app.use((err, req, res, next) => {
   console.error('❌ Erreur serveur:', {
     message: err.message,
@@ -184,7 +215,7 @@ app.use((err, req, res, next) => {
     });
   }
   
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isDevelopment = process.env.NODE_ENV !== 'production';
   
   res.status(err.status || 500).json({
     error: {
@@ -203,7 +234,7 @@ app.listen(PORT, () => {
   console.log('═══════════════════════════════════════════════════');
   console.log(`🌐 URL : http://localhost:${PORT}`);
   console.log(`📂 Frontend : ${frontendDir}`);
-  console.log(`🛡️ Helmet + CORS + Rate Limiting activés`);
+  console.log(`🛡️ Helmet + CORS + Rate Limiting + CSRF activés`);
   console.log(`🔒 Mode : ${process.env.NODE_ENV || 'development'}`);
   console.log('═══════════════════════════════════════════════════');
 });
