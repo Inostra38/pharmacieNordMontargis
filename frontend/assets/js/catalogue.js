@@ -1,12 +1,175 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = =
-// Catalogue - Version Sans Catégories - BUG FIX: CSP Error (onclick inline)
+// Catalogue - Version avec Pagination Intégrée v3.1
+// Chargement automatique par boucle while
 // = = = = = = = = = = = = = = = = = = = = = = = = =
 
 // Vérifie si CONFIG est défini, sinon log une erreur claire.
 if (typeof CONFIG === 'undefined') {
     console.error('ERREUR CRITIQUE: CONFIG non défini. Assurez-vous que config.js est chargé AVANT catalogue.js');
 }
-const API_URL = CONFIG ? CONFIG.API.BASE_URL : ''; // Utilise CONFIG ou une chaîne vide par sécurité
+const API_URL = CONFIG ? CONFIG.API.BASE_URL : '';
+
+// --- Product Cache avec Pagination Automatique ---
+window.productCache = {
+    products: [],
+    metadata: null,
+    initialized: false,
+    totalProducts: 0,
+    BATCH_SIZE: 500,
+    
+    async load() {
+        console.log('🔄 Chargement progressif des produits...');
+        
+        if (this.initialized && this.products.length > 0) {
+            console.log(`✅ Cache: ${this.products.length} produits`);
+            return this.products;
+        }
+        
+        // Charger le premier batch
+        await this.loadBatch(0);
+        this.initialized = true;
+        
+        // Charger le reste en arrière-plan avec boucle while
+        this.loadRemainingBatches();
+        
+        return this.products;
+    },
+    
+    async loadBatch(batchNumber) {
+        const offset = batchNumber * this.BATCH_SIZE;
+        const startTime = performance.now();
+        
+        console.log(`📦 Batch ${batchNumber} (offset: ${offset})`);
+        
+        try {
+            const response = await window.apiService.getProducts({
+                limit: this.BATCH_SIZE,
+                offset: offset
+            });
+            
+            const duration = Math.round(performance.now() - startTime);
+            
+            // Parser la réponse API
+            let items = [];
+            let total = 0;
+            let cached = false;
+            let updatedAt = null;
+            let stockUpdatedAt = null;
+            
+            if (Array.isArray(response)) {
+                items = response;
+                total = response.length;
+            } else if (response && response.success && response.data) {
+                if (Array.isArray(response.data.products)) {
+                    items = response.data.products;
+                    total = response.data.total || items.length;
+                    cached = response.data.cached || false;
+                } else if (Array.isArray(response.data)) {
+                    items = response.data;
+                    total = response.total || items.length;
+                    cached = response.cached || false;
+                } else if (response.data.items && Array.isArray(response.data.items)) {
+                    items = response.data.items;
+                    total = response.data.total || items.length;
+                    cached = response.data.cached || false;
+                }
+                updatedAt = response.updatedAt || response.data.updatedAt;
+                stockUpdatedAt = response.stockUpdatedAt || response.data.stockUpdatedAt;
+            } else if (response && response.data) {
+                if (Array.isArray(response.data.products)) {
+                    items = response.data.products;
+                    total = response.data.total || items.length;
+                    cached = response.data.cached || false;
+                } else if (Array.isArray(response.data.items)) {
+                    items = response.data.items;
+                    total = response.data.total || items.length;
+                    cached = response.data.cached || false;
+                } else if (Array.isArray(response.data)) {
+                    items = response.data;
+                    total = response.total || items.length;
+                    cached = response.cached || false;
+                }
+                updatedAt = response.updatedAt || response.data.updatedAt;
+                stockUpdatedAt = response.stockUpdatedAt || response.data.stockUpdatedAt;
+            } else if (response && Array.isArray(response.items)) {
+                items = response.items;
+                total = response.total || items.length;
+                cached = response.cached || false;
+                updatedAt = response.updatedAt;
+                stockUpdatedAt = response.stockUpdatedAt;
+            }
+            
+            if (!Array.isArray(items)) {
+                items = [];
+            }
+            
+            if (batchNumber === 0) {
+                this.metadata = {
+                    updatedAt: updatedAt || new Date().toISOString(),
+                    stockUpdatedAt: stockUpdatedAt || new Date().toISOString()
+                };
+                this.totalProducts = total || 0;
+                console.log(`📊 Total déclaré: ${this.totalProducts} produits`);
+            }
+            
+            // Ajouter les produits (pas de filtre doublons pour l'instant)
+            if (items.length > 0) {
+                this.products.push(...items);
+            }
+            
+            const cacheStatus = cached ? '🟢 HIT' : '🔴 MISS';
+            console.log(`✅ Batch ${batchNumber}: ${items.length} produits - ${duration}ms (${cacheStatus})`);
+            console.log(`   Total chargé: ${this.products.length}`);
+            
+            return { response, itemsCount: items.length };
+            
+        } catch (error) {
+            console.error(`❌ Erreur batch ${batchNumber}:`, error);
+            return { response: null, itemsCount: 0 };
+        }
+    },
+    
+    async loadRemainingBatches() {
+        if (this.totalProducts <= this.BATCH_SIZE) {
+            console.log('✅ Un seul batch, chargement complet');
+            return;
+        }
+        
+        let batchNumber = 1;
+        let continueLoading = true;
+        
+        console.log(`🔄 Chargement arrière-plan: mode automatique (batches de ${this.BATCH_SIZE})`);
+        
+        while (continueLoading) {
+            const result = await this.loadBatch(batchNumber);
+            
+            // Si moins de BATCH_SIZE items, c'est le dernier batch
+            if (result.itemsCount < this.BATCH_SIZE) {
+                console.log(`🏁 Dernier batch détecté (${result.itemsCount} produits)`);
+                continueLoading = false;
+            }
+            
+            // Vérifier aussi si on a atteint le total déclaré
+            if (this.totalProducts > 0 && this.products.length >= this.totalProducts) {
+                console.log(`🏁 Total atteint (${this.products.length}/${this.totalProducts})`);
+                continueLoading = false;
+            }
+            
+            batchNumber++;
+            
+            // Petit délai entre chaque batch
+            if (continueLoading) {
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+        
+        console.log(`✅ Complet: ${this.products.length} produits chargés en ${batchNumber} batches`);
+    },
+    
+    getMetadata() {
+        return this.metadata;
+    }
+};
 
 // --- État et Cache ---
 const state = {
@@ -97,9 +260,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-/**
- * Créer une carte produit (avec data-* promo et bouton/lien dynamique)
- */
 function renderProduct(item) {
     if (!item) return '';
 
@@ -154,9 +314,6 @@ function renderProduct(item) {
     `;
 }
 
-/**
- * Affiche les produits et attache les événements pour "Réserver"
- */
 function renderGrid(items) {
     const grid = document.getElementById('productsGrid');
     const resultsCountEl = document.getElementById('resultsCount');
@@ -226,16 +383,19 @@ function getInitialProducts() {
     const used = new Set();
     const productKey = p => p.id || p.cip;
 
+    // 1. Featured
     ALL_PRODUCTS.filter(p => p && p.featured).forEach(p => {
         const key = productKey(p);
         if (key && !used.has(key)) { items.push(p); used.add(key); }
     });
 
+    // 2. Petits Prix
     ALL_PRODUCTS.filter(p => p && norm(p.promo_libelle || '') === 'petits prix').forEach(p => {
         const key = productKey(p);
         if (key && !used.has(key)) { items.push(p); used.add(key); }
     });
 
+    // 3. Promotions
     ALL_PRODUCTS.filter(p => {
         if (!p) return false;
         const key = productKey(p);
@@ -249,6 +409,7 @@ function getInitialProducts() {
         if (key && !used.has(key)) { items.push(p); used.add(key); }
     });
 
+    // 4. Aléatoire (limité à 150)
     const remaining = ALL_PRODUCTS.filter(p => p && !used.has(productKey(p)));
     const random = shuffle(remaining).slice(0, 150);
     random.forEach(p => {
@@ -309,7 +470,7 @@ function resetFilters() {
 
 // --- Init ---
 async function init() {
-    console.log('🚀 Initialisation catalogue (sans catégories)');
+    console.log('🚀 Initialisation catalogue v3.1 (Pagination automatique)');
 
     const grid = document.getElementById('productsGrid');
     const loading = document.getElementById('loadingIndicator');
@@ -331,6 +492,7 @@ async function init() {
 
     try {
         if (!window.productCache) throw new Error('productCache non disponible!');
+        
         ALL_PRODUCTS = await window.productCache.load();
         if (!Array.isArray(ALL_PRODUCTS)) ALL_PRODUCTS = [];
         console.log(`✅ ${ALL_PRODUCTS.length} produits chargés.`);
@@ -362,7 +524,6 @@ async function init() {
     } catch (error) {
         console.error('❌ Erreur initialisation catalogue:', error);
         
-        // ✅ FIX: Suppression du onclick inline, création d'un ID et attachement de l'événement
         grid.innerHTML = 
         `<div class="col-span-full text-center py-12">
             <p class="text-red-500 text-xl font-bold mb-2">❌ Erreur de chargement du catalogue</p>
@@ -370,7 +531,6 @@ async function init() {
             <button id="retryButton" class="mt-4 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700">Réessayer</button>
         </div>`;
         
-        // ✅ Attacher l'événement après la création du HTML
         const retryButton = document.getElementById('retryButton');
         if (retryButton) {
             retryButton.addEventListener('click', () => location.reload());
@@ -383,7 +543,7 @@ async function init() {
 
 // --- Events ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Catalogue.js: DOMContentLoaded');
+    console.log('Catalogue.js v3.1: DOMContentLoaded');
 
     if (typeof CONFIG === 'undefined' || !window.productCache || !window.cartManager) {
         console.error("ERREUR: Dépendances manquantes (CONFIG, productCache, ou cartManager). L'initialisation est annulée.");
@@ -443,4 +603,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-console.log('✅ Catalogue chargé (vSansCategories - BUG FIX CSP)');
+console.log('✅ Catalogue v3.1 chargé (Pagination automatique avec boucle while)');

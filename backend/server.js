@@ -153,9 +153,10 @@ const strictApiLimiter = rateLimit({
   }
 });
 
+// APRÈS
 const moderateApiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  max: 200,  // ✅ Augmenté pour supporter 19 batches + marge
   message: {
     error: 'Trop de requêtes. Veuillez patienter quelques minutes.',
     retryAfter: '15 minutes'
