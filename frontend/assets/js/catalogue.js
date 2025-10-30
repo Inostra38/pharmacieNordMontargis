@@ -1,6 +1,6 @@
 // = = = = = = = = = = = = = = = = = = = = = = = = =
-// Catalogue - Version avec Pagination Intégrée v3.1
-// Chargement automatique par boucle while
+// Catalogue - Version avec Rendu Unique v3.5
+// Badge de chargement + Filtres désactivés pendant chargement
 // = = = = = = = = = = = = = = = = = = = = = = = = =
 
 // Vérifie si CONFIG est défini, sinon log une erreur claire.
@@ -9,13 +9,15 @@ if (typeof CONFIG === 'undefined') {
 }
 const API_URL = CONFIG ? CONFIG.API.BASE_URL : '';
 
-// --- Product Cache avec Pagination Automatique ---
+// --- Product Cache avec Pagination Automatique et Callback ---
 window.productCache = {
     products: [],
     metadata: null,
     initialized: false,
     totalProducts: 0,
     BATCH_SIZE: 500,
+    isLoading: false,
+    onProgressCallback: null, // Callback pour mettre à jour le badge
     
     async load() {
         console.log('🔄 Chargement progressif des produits...');
@@ -25,11 +27,15 @@ window.productCache = {
             return this.products;
         }
         
+        this.isLoading = true;
+        
         // Charger le premier batch
         await this.loadBatch(0);
         this.initialized = true;
         
-        // Charger le reste en arrière-plan avec boucle while
+        // ✅ NE PAS appeler de rendu ici - sera fait dans init()
+        
+        // Charger le reste en arrière-plan
         this.loadRemainingBatches();
         
         return this.products;
@@ -112,14 +118,31 @@ window.productCache = {
                 console.log(`📊 Total déclaré: ${this.totalProducts} produits`);
             }
             
-            // Ajouter les produits (pas de filtre doublons pour l'instant)
+            // ✅ Ajouter les produits SANS DOUBLONS
             if (items.length > 0) {
-                this.products.push(...items);
+                // Créer un Set des IDs existants pour éviter les doublons
+                const existingIds = new Set(this.products.map(p => p.id || p.cip));
+                const newProducts = items.filter(item => {
+                    const key = item.id || item.cip;
+                    return key && !existingIds.has(key);
+                });
+                
+                if (newProducts.length > 0) {
+                    this.products.push(...newProducts);
+                    console.log(`   ➕ ${newProducts.length} nouveaux produits ajoutés (${items.length - newProducts.length} doublons ignorés)`);
+                } else {
+                    console.log(`   ⚠️ Tous les produits du batch sont des doublons !`);
+                }
             }
             
             const cacheStatus = cached ? '🟢 HIT' : '🔴 MISS';
             console.log(`✅ Batch ${batchNumber}: ${items.length} produits - ${duration}ms (${cacheStatus})`);
             console.log(`   Total chargé: ${this.products.length}`);
+            
+            // ✅ Appeler le callback pour mettre à jour le badge
+            if (this.onProgressCallback) {
+                this.onProgressCallback(this.products.length, this.totalProducts);
+            }
             
             return { response, itemsCount: items.length };
             
@@ -132,13 +155,14 @@ window.productCache = {
     async loadRemainingBatches() {
         if (this.totalProducts <= this.BATCH_SIZE) {
             console.log('✅ Un seul batch, chargement complet');
+            this.isLoading = false;
             return;
         }
         
         let batchNumber = 1;
         let continueLoading = true;
         
-        console.log(`🔄 Chargement arrière-plan: mode automatique (batches de ${this.BATCH_SIZE})`);
+        console.log(`🔄 Chargement arrière-plan: batches de ${this.BATCH_SIZE}`);
         
         while (continueLoading) {
             const result = await this.loadBatch(batchNumber);
@@ -163,7 +187,13 @@ window.productCache = {
             }
         }
         
-        console.log(`✅ Complet: ${this.products.length} produits chargés en ${batchNumber} batches`);
+        console.log(`✅ Complet: ${this.products.length} produits en ${batchNumber} batches`);
+        this.isLoading = false;
+        
+        // ✅ Signaler que le chargement est terminé
+        if (this.onProgressCallback) {
+            this.onProgressCallback(this.products.length, this.totalProducts, true);
+        }
     },
     
     getMetadata() {
@@ -180,6 +210,8 @@ const state = {
 };
 let ALL_PRODUCTS = [];
 let BRANDS = [];
+let isFirstRenderDone = false; // ✅ Flag pour éviter rendus multiples
+let filtersEnabled = false;     // ✅ Flag pour désactiver filtres pendant chargement
 
 // --- Utilitaires ---
 const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -422,6 +454,12 @@ function getInitialProducts() {
 
 // --- Filtres ---
 function applyFilters() {
+    // ✅ Bloquer les filtres pendant le chargement
+    if (!filtersEnabled) {
+        console.log('⚠️ Filtres désactivés pendant le chargement');
+        return;
+    }
+    
     if (!Array.isArray(ALL_PRODUCTS)) {
         console.error("applyFilters: ALL_PRODUCTS n'est pas prêt.");
         return;
@@ -468,9 +506,65 @@ function resetFilters() {
     console.log('🔄 Filtres réinitialisés.');
 }
 
+// ✅ NOUVEAU : Fonction pour créer et mettre à jour le badge de chargement
+function updateLoadingBadge(loaded, total, complete = false) {
+    let badge = document.getElementById('loadingBadge');
+    
+    if (!badge) {
+        // Créer le badge s'il n'existe pas
+        const resultsCountEl = document.getElementById('resultsCount');
+        if (!resultsCountEl) return;
+        
+        badge = document.createElement('span');
+        badge.id = 'loadingBadge';
+        badge.className = 'ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 animate-pulse';
+        resultsCountEl.parentElement.appendChild(badge);
+    }
+    
+    if (complete) {
+        // Chargement terminé - supprimer le badge après une courte animation
+        badge.classList.remove('animate-pulse');
+        badge.classList.add('bg-green-100', 'text-green-700', 'dark:bg-green-900', 'dark:text-green-300');
+        badge.textContent = '✅ Complet';
+        
+        setTimeout(() => {
+            if (badge && badge.parentElement) {
+                badge.remove();
+            }
+        }, 2000);
+    } else {
+        // En cours de chargement
+        badge.textContent = `📥 Chargement... ${loaded}/${total}`;
+    }
+}
+
+// ✅ NOUVEAU : Fonction pour désactiver/activer les filtres
+function setFiltersState(enabled) {
+    filtersEnabled = enabled;
+    
+    const searchInput = document.getElementById('searchInput');
+    const labFilter = document.getElementById('labFilter');
+    const stockFilter = document.getElementById('stockFilter');
+    const displayModeRadios = document.querySelectorAll('input[name="displayMode"]');
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    
+    const elements = [searchInput, labFilter, stockFilter, resetBtn, ...displayModeRadios].filter(el => el);
+    
+    elements.forEach(el => {
+        el.disabled = !enabled;
+        if (enabled) {
+            el.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+            el.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    });
+    
+    console.log(enabled ? '✅ Filtres activés' : '⚠️ Filtres désactivés');
+}
+
 // --- Init ---
 async function init() {
-    console.log('🚀 Initialisation catalogue v3.1 (Pagination automatique)');
+    console.log('🚀 Initialisation catalogue v3.5 (Rendu unique + Badge)');
 
     const grid = document.getElementById('productsGrid');
     const loading = document.getElementById('loadingIndicator');
@@ -480,6 +574,9 @@ async function init() {
         console.error('ERREUR CRITIQUE: Éléments init introuvables !');
         return;
     }
+
+    // ✅ Désactiver les filtres pendant le chargement
+    setFiltersState(false);
 
     loading.classList.remove('hidden');
     grid.innerHTML = Array(9).fill('').map(() =>
@@ -493,10 +590,30 @@ async function init() {
     try {
         if (!window.productCache) throw new Error('productCache non disponible!');
         
+        // ✅ Configurer le callback de progression
+        window.productCache.onProgressCallback = (loaded, total, complete) => {
+            updateLoadingBadge(loaded, total, complete);
+            
+            // ✅ Activer les filtres quand le chargement est terminé
+            if (complete) {
+                setFiltersState(true);
+            }
+        };
+        
+        // Charger les produits (seulement le premier batch sera affiché)
         ALL_PRODUCTS = await window.productCache.load();
         if (!Array.isArray(ALL_PRODUCTS)) ALL_PRODUCTS = [];
-        console.log(`✅ ${ALL_PRODUCTS.length} produits chargés.`);
+        console.log(`✅ ${ALL_PRODUCTS.length} produits chargés (premier batch).`);
 
+        // ✅ UN SEUL RENDU ICI (après le premier batch)
+        if (!isFirstRenderDone) {
+            const initialProducts = getInitialProducts();
+            renderGrid(initialProducts);
+            isFirstRenderDone = true;
+            console.log('✅ Premier rendu effectué');
+        }
+
+        // Charger les marques
         BRANDS = await fetchBrands();
         if (!Array.isArray(BRANDS)) BRANDS = [];
         console.log(`✅ ${BRANDS.length} marques chargées.`);
@@ -512,9 +629,6 @@ async function init() {
                       labFilter.appendChild(opt);
                   });
         }
-
-        const initialProducts = getInitialProducts();
-        renderGrid(initialProducts);
 
         const metadata = window.productCache.getMetadata();
         updateTimeEl.textContent = (metadata && metadata.updatedAt) ? `Mise à jour : ${formatDate(metadata.updatedAt)}` : 'Date indisponible';
@@ -536,6 +650,9 @@ async function init() {
             retryButton.addEventListener('click', () => location.reload());
         }
         
+        // ✅ Réactiver les filtres même en cas d'erreur
+        setFiltersState(true);
+        
     } finally {
         loading.classList.add('hidden');
     }
@@ -543,7 +660,7 @@ async function init() {
 
 // --- Events ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Catalogue.js v3.1: DOMContentLoaded');
+    console.log('Catalogue.js v3.5: DOMContentLoaded');
 
     if (typeof CONFIG === 'undefined' || !window.productCache || !window.cartManager) {
         console.error("ERREUR: Dépendances manquantes (CONFIG, productCache, ou cartManager). L'initialisation est annulée.");
@@ -603,4 +720,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-console.log('✅ Catalogue v3.1 chargé (Pagination automatique avec boucle while)');
+console.log('✅ Catalogue v3.5 chargé (Rendu unique + Badge de chargement + Filtres désactivés)');

@@ -1,5 +1,6 @@
 // ==========================================
 // MIDDLEWARE CSRF - PROTECTION ULTRA-SÉCURISÉE
+// Avec liste blanche pour routes non-sensibles
 // ==========================================
 
 const csrf = require('csurf');
@@ -24,10 +25,45 @@ const csrfProtection = csrf({
 });
 
 /**
+ * ✅ NOUVEAU : Liste blanche des routes qui ne nécessitent pas de protection CSRF
+ * Ces routes sont en lecture seule et non-sensibles
+ * 
+ * IMPORTANT : Les chemins sont RELATIFS au router monté
+ * Exemple : Si monté sur /api/products, alors /cache-info = /api/products/cache-info
+ */
+const CSRF_WHITELIST = [
+  '/cache-info',       // Route: /api/products/cache-info (lecture seule)
+  '/api/csrf-token'    // Route: /api/csrf-token (génération token)
+];
+
+/**
+ * Vérifier si une route est dans la liste blanche
+ */
+function isWhitelisted(path) {
+  console.log('🔍 DEBUG isWhitelisted - path reçu:', path);
+  console.log('🔍 DEBUG isWhitelisted - CSRF_WHITELIST:', CSRF_WHITELIST);
+  
+  const result = CSRF_WHITELIST.some(whitelisted => {
+    const match = path === whitelisted || path.startsWith(whitelisted);
+    console.log(`🔍 Comparaison: "${path}" vs "${whitelisted}" = ${match}`);
+    return match;
+  });
+  
+  console.log('🔍 DEBUG isWhitelisted - résultat final:', result);
+  return result;
+}
+
+/**
  * Middleware de vérification d'origine
  * Vérifie que la requête vient bien d'un domaine autorisé
  */
 function verifyOrigin(req, res, next) {
+  // ✅ IMPORTANT : Vérifier la whitelist EN PREMIER (avant origin)
+  if (isWhitelisted(req.path)) {
+    console.log('✅ Route whitelistée, accès autorisé sans origin:', req.path);
+    return next();
+  }
+  
   const origin = req.get('origin') || req.get('referer');
   
   // Liste blanche des domaines autorisés
@@ -38,7 +74,7 @@ function verifyOrigin(req, res, next) {
     'https://www.pharmacienordmontargis.fr'
   ];
   
-  // ✅ NOUVEAU : Bloquer si pas d'origine (sauf pour /api/csrf-token)
+  // Bloquer si pas d'origine (sauf pour /api/csrf-token)
   if (!origin) {
     // Autoriser seulement pour la route de génération du token CSRF
     if (req.path === '/api/csrf-token') {
@@ -112,16 +148,30 @@ function handleCsrfError(err, req, res, next) {
 }
 
 /**
- * Middleware combiné : Origin + CSRF
+ * ✅ NOUVEAU : Middleware CSRF conditionnel
+ * Applique la protection CSRF sauf pour les routes whitelistées
+ */
+function conditionalCsrfProtection(req, res, next) {
+  if (isWhitelisted(req.path)) {
+    console.log('✅ Route whitelistée, pas de protection CSRF:', req.path);
+    return next();
+  }
+  
+  // Appliquer la protection CSRF normale
+  csrfProtection(req, res, next);
+}
+
+/**
+ * Middleware combiné : Origin + CSRF conditionnel
  * À utiliser sur toutes les routes sensibles (sauf /api/csrf-token)
  */
 function protectRoute(req, res, next) {
-  // Étape 1 : Vérifier l'origine
+  // Étape 1 : Vérifier l'origine (avec whitelist)
   verifyOrigin(req, res, (err) => {
     if (err) return next(err);
     
-    // Étape 2 : Vérifier le token CSRF
-    csrfProtection(req, res, next);
+    // Étape 2 : Vérifier le token CSRF (avec whitelist)
+    conditionalCsrfProtection(req, res, next);
   });
 }
 
@@ -150,9 +200,11 @@ function getCsrfToken(req, res) {
 // ==========================================
 
 module.exports = {
-  csrfProtection,      // Protection CSRF seule
-  verifyOrigin,        // Vérification origine seule
-  protectRoute,        // Protection combinée (recommandé pour routes sensibles)
-  handleCsrfError,     // Gestionnaire d'erreurs
-  getCsrfToken         // Handler pour route /api/csrf-token
+  csrfProtection,           // Protection CSRF seule
+  verifyOrigin,             // Vérification origine seule
+  protectRoute,             // Protection combinée avec whitelist (recommandé)
+  conditionalCsrfProtection, // Protection CSRF avec whitelist
+  handleCsrfError,          // Gestionnaire d'erreurs
+  getCsrfToken,             // Handler pour route /api/csrf-token
+  isWhitelisted             // Utilitaire pour vérifier whitelist
 };

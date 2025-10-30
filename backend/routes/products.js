@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const fileCache = require('../cache/file-cache');
 
 // ============================================
 // 🔍 VALIDATION DES VARIABLES D'ENVIRONNEMENT
@@ -9,47 +10,6 @@ if (!process.env.GOOGLE_APPS_SCRIPT_URL) {
     console.error('❌ ERREUR CRITIQUE [products.js] - Variable GOOGLE_APPS_SCRIPT_URL manquante dans .env');
     console.error('⚠️  Le module products.js ne pourra pas récupérer les produits !');
 }
-
-// ============================================
-// 💾 CACHE SERVEUR (10 minutes)
-// ============================================
-
-class ProductCache {
-    constructor() {
-        this.cache = null;
-        this.timestamp = null;
-        this.TTL = 10 * 60 * 1000; // 10 minutes en millisecondes
-    }
-
-    isValid() {
-        if (!this.cache || !this.timestamp) return false;
-        return (Date.now() - this.timestamp) < this.TTL;
-    }
-
-    set(data) {
-        this.cache = data;
-        this.timestamp = Date.now();
-        console.log('💾 Cache produits mis à jour');
-    }
-
-    get() {
-        if (this.isValid()) {
-            const age = Math.round((Date.now() - this.timestamp) / 1000);
-            console.log(`✅ Cache valide (age: ${age}s)`);
-            return this.cache;
-        }
-        console.log('⏰ Cache expiré ou vide');
-        return null;
-    }
-
-    clear() {
-        this.cache = null;
-        this.timestamp = null;
-        console.log('🗑️ Cache produits vidé');
-    }
-}
-
-const productCache = new ProductCache();
 
 // ============================================
 // 🔄 FONCTION DE RÉCUPÉRATION DEPUIS GOOGLE APPS SCRIPT
@@ -94,29 +54,54 @@ async function fetchFromGoogleAppsScript(params = {}) {
 
 // ============================================
 // 📍 ROUTE : GET /api/products
-// Récupère tous les produits (avec cache)
+// Récupère tous les produits (avec cache fichier 2h + pagination)
 // ============================================
 
 router.get('/', async (req, res) => {
     console.log('[INFO] 📦 Requête de récupération des produits...');
 
     try {
-        // Vérifier le cache d'abord
-        const cachedData = productCache.get();
+        // Récupérer les paramètres de pagination
+        const limit = parseInt(req.query.limit) || 500;
+        const offset = parseInt(req.query.offset) || 0;
+        
+        console.log(`📊 Pagination demandée: limit=${limit}, offset=${offset}`);
+        
+        // 1. Vérifier le cache fichier d'abord
+        const cachedData = await fileCache.get();
         
         if (cachedData) {
+            console.log('✅ Cache valide trouvé');
+            const cacheInfo = await fileCache.getInfo();
+            
+            // ✅ IMPORTANT : Appliquer limit et offset sur les données du cache
+            const allItems = cachedData.items || [];
+            const paginatedItems = allItems.slice(offset, offset + limit);
+            
+            console.log(`📦 Cache: ${allItems.length} produits total, retour de ${paginatedItems.length} produits (offset: ${offset})`);
+            
             return res.json({
                 success: true,
-                data: cachedData,
+                data: {
+                    items: paginatedItems,
+                    total: allItems.length,
+                    updatedAt: cachedData.updatedAt,
+                    stockUpdatedAt: cachedData.stockUpdatedAt,
+                    cached: true
+                },
                 cached: true,
-                cacheAge: Math.round((Date.now() - productCache.timestamp) / 1000)
+                cacheAge: cacheInfo.ageMinutes,
+                expiresIn: cacheInfo.remainingMinutes
             });
         }
 
-        // Si pas de cache, récupérer depuis Google Apps Script
+        // 2. Si pas de cache, récupérer depuis Google Apps Script
+        console.log('🔄 Pas de cache valide, récupération depuis Apps Script...');
+        
+        // ⚠️ Charger TOUS les produits pour remplir le cache
         const params = {
-            limit: req.query.limit || 1000,
-            offset: req.query.offset || 0
+            limit: 50000,  // Charger tout pour le cache
+            offset: 0
         };
 
         if (req.query.q) params.q = req.query.q;
@@ -124,12 +109,24 @@ router.get('/', async (req, res) => {
 
         const data = await fetchFromGoogleAppsScript(params);
 
-        // Mettre en cache
-        productCache.set(data);
+        // 3. Mettre en cache fichier (2h)
+        await fileCache.set(data);
+        
+        // 4. Appliquer la pagination sur les données fraîches
+        const allItems = data.items || [];
+        const paginatedItems = allItems.slice(offset, offset + limit);
+        
+        console.log(`📦 Apps Script: ${allItems.length} produits total, retour de ${paginatedItems.length} produits (offset: ${offset})`);
 
         res.json({
             success: true,
-            data: data,
+            data: {
+                items: paginatedItems,
+                total: allItems.length,
+                updatedAt: data.updatedAt,
+                stockUpdatedAt: data.stockUpdatedAt,
+                cached: false
+            },
             cached: false
         });
 
@@ -147,13 +144,14 @@ router.get('/', async (req, res) => {
 // ============================================
 // 📍 ROUTE : GET /api/products/home
 // Produits optimisés pour la page d'accueil
+// (PAS de cache - toujours fresh)
 // ============================================
 
 router.get('/home', async (req, res) => {
     console.log('[INFO] 🏠 Requête de produits pour la page d\'accueil...');
 
     try {
-        // Pas de cache pour la page d'accueil (toujours fresh)
+        // Pas de cache pour la page d'accueil
         const data = await fetchFromGoogleAppsScript({ home: 1 });
 
         res.json({
@@ -175,6 +173,7 @@ router.get('/home', async (req, res) => {
 // ============================================
 // 📍 ROUTE : GET /api/products/brands
 // Récupère la liste des marques
+// (PAS de cache - toujours fresh)
 // ============================================
 
 router.get('/brands', async (req, res) => {
@@ -200,6 +199,33 @@ router.get('/brands', async (req, res) => {
 });
 
 // ============================================
+// 📍 ROUTE : GET /api/products/cache-info
+// Informations sur l'état du cache fichier
+// ============================================
+
+router.get('/cache-info', async (req, res) => {
+    console.log('[INFO] ℹ️ Requête d\'informations cache...');
+
+    try {
+        const info = await fileCache.getInfo();
+        
+        res.json({
+            success: true,
+            cache: info
+        });
+
+    } catch (error) {
+        console.error('[ERREUR] ❌ Erreur récupération info cache:', error);
+        
+        res.status(500).json({
+            success: false,
+            error: 'Erreur serveur',
+            message: 'Impossible de récupérer les informations du cache.'
+        });
+    }
+});
+
+// ============================================
 // 📍 ROUTE : POST /api/products/refresh-cache
 // Force le rafraîchissement du cache (admin uniquement)
 // ============================================
@@ -208,10 +234,14 @@ router.post('/refresh-cache', async (req, res) => {
     console.log('[INFO] 🔄 Demande de rafraîchissement du cache...');
 
     try {
-        productCache.clear();
+        // 1. Vider le cache actuel
+        await fileCache.clear();
         
-        const data = await fetchFromGoogleAppsScript({});
-        productCache.set(data);
+        // 2. Récupérer les nouvelles données (TOUS les produits)
+        const data = await fetchFromGoogleAppsScript({ limit: 50000, offset: 0 });
+        
+        // 3. Sauvegarder dans le cache
+        await fileCache.set(data);
 
         res.json({
             success: true,

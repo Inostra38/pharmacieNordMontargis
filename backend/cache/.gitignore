@@ -1,0 +1,12 @@
+# ==========================================
+# Ignorer les fichiers de cache
+# ==========================================
+
+# Cache des produits (se régénère automatiquement)
+products-cache.json
+
+# Tous les fichiers JSON de cache
+*.json
+
+# Logs potentiels
+*.log
