@@ -221,7 +221,7 @@ app.get('*', (req, res, next) => {
 // ============================================
 // GESTION D'ERREURS
 // ============================================
-no
+
 // Gestionnaire CSRF (doit être AVANT le gestionnaire général)
 app.use(handleCsrfError);
 
