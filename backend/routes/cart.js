@@ -2,23 +2,59 @@ const express = require('express');
 const FormData = require('form-data'); 
 const Mailgun = require('mailgun.js');
 const router = express.Router();
+const { validateCart } = require('../middleware/validation.middleware');
+
+// ============================================
+// 🔍 VALIDATION DES VARIABLES D'ENVIRONNEMENT
+// ============================================
+
+// ✅ MODIFICATION ICI :
+// J'utilise RECIPIENT_EMAIL (comme prescription.js) au lieu de PHARMACIST_EMAIL.
+const requiredEnvVars = [
+    'MAILGUN_API_KEY',
+    'MAILGUN_DOMAIN',
+    'MAILGUN_API_HOST',
+    'RECIPIENT_EMAIL', // <-- CHANGÉ ICI
+    'FROM_EMAIL'
+];
+
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingVars.length > 0) {
+    console.error('❌ ERREUR CRITIQUE [cart.js] - Variables d\'environnement manquantes:');
+    missingVars.forEach(varName => {
+        console.error(`   - ${varName}`);
+    });
+    console.error('\n⚠️  Le module cart.js ne pourra pas envoyer d\'emails !');
+}
+
+// Log de configuration
+console.log('🛒 Configuration Panier (Cart):');
+console.log('   - API Key:', process.env.MAILGUN_API_KEY ? '✅ Configurée' : '❌ MANQUANTE');
+console.log('   - Domain:', process.env.MAILGUN_DOMAIN || '❌ MANQUANT');
+console.log('   - Host:', process.env.MAILGUN_API_HOST || '❌ MANQUANT (utilisera https://api.eu.mailgun.net)');
+console.log('   - Recipient Email:', process.env.RECIPIENT_EMAIL || '❌ MANQUANT'); // <-- CHANGÉ ICI
+console.log('   - From Email:', process.env.FROM_EMAIL || '❌ MANQUANT');
 
 // --- Configuration Mailgun ---
 const mailgun = new Mailgun(FormData);
 const mg = mailgun.client({
   username: 'api',
-  key: process.env.MAILGUN_API_KEY, 
-  url: process.env.MAILGUN_API_HOST || 'https://api.mailgun.net' 
+  key: process.env.MAILGUN_API_KEY || 'MISSING_KEY',
+  url: process.env.MAILGUN_API_HOST || 'https://api.eu.mailgun.net'
 });
 
 // --- Helpers (pour formater l'e-mail) ---
 const formatPrice = (price) => {
-    return parseFloat(price).toFixed(2).replace('.', ',') + ' €';
+    const parsedPrice = parseFloat(price);
+    if (isNaN(parsedPrice)) {
+        return 'N/A';
+    }
+    return parsedPrice.toFixed(2).replace('.', ',') + ' €';
 };
 
 /**
  * Crée le corps HTML de l'e-mail pour le PHARMACIEN
- * MODIFIÉ : Utilise maintenant 'cart' au lieu de 'items'
  */
 const createPharmacistEmail = (details) => {
     const { name, phone, email, message, cart, total } = details;
@@ -68,7 +104,6 @@ const createPharmacistEmail = (details) => {
 
 /**
  * Crée le corps HTML de l'e-mail pour le CLIENT (Simplifié)
- * MODIFIÉ : Utilise maintenant 'cart' au lieu de 'items'
  */
 const createClientEmail = (details) => {
     const { name, phone, email, cart, total } = details;
@@ -114,31 +149,33 @@ const createClientEmail = (details) => {
 
 /**
  * @route POST /api/cart/send-reservation
- * MODIFIÉ : Utilise maintenant 'cart' au lieu de 'items'
  */
-router.post('/send-reservation', async (req, res) => {
+router.post('/send-reservation', validateCart, async (req, res) => {
     
     console.log('[INFO] Requête de réservation de panier reçue...');
     
     try {
-        // ✅ MODIFICATION : 'items' remplacé par 'cart'
-        const { name, phone, email, message, sendConfirmation, cart, total } = req.body;
-
-        // ✅ MODIFICATION : Validation avec 'cart' au lieu de 'items'
-        if (!name || !phone || !email || !cart || cart.length === 0 || !total) {
-            console.warn('[WARN] Requête de réservation invalide, données manquantes.');
-            return res.status(400).json({ message: 'Données de réservation manquantes (nom, téléphone, email, cart ou total).' });
+        if (missingVars.length > 0) {
+            console.error('[ERREUR] ❌ Impossible d\'envoyer l\'email : variables manquantes');
+            return res.status(500).json({ 
+                error: 'Configuration serveur incomplète',
+                message: 'Contactez l\'administrateur du site.',
+                missingVars: missingVars
+            });
         }
         
+        const { name, phone, email, message, cart, total } = req.body;
+
         // Email pour le pharmacien
         const pharmacistEmailData = {
             from: process.env.FROM_EMAIL,
-            to: [process.env.PHARMACIST_EMAIL],
+            to: [process.env.RECIPIENT_EMAIL], // ✅ MODIFICATION ICI
             subject: `Nouvelle Réservation de ${name} (Site Web)`,
             html: createPharmacistEmail(req.body),
         };
 
-        console.log(`[INFO] Envoi de la réservation à ${process.env.PHARMACIST_EMAIL}...`);
+        // ✅ MODIFICATION ICI
+        console.log(`[INFO] Envoi de la réservation à ${process.env.RECIPIENT_EMAIL}...`);
         const pharmacistResponse = await mg.messages.create(
             process.env.MAILGUN_DOMAIN, 
             pharmacistEmailData
@@ -169,7 +206,20 @@ router.post('/send-reservation', async (req, res) => {
 
     } catch (error) {
         console.error("[ERREUR] Échec de l'envoi de la réservation:", error);
-        res.status(500).json({ message: 'Une erreur est survenue lors de l\'envoi.' });
+        
+        if (error.status) {
+            return res.status(error.status).json({
+                error: 'Erreur d\'envoi',
+                message: 'Impossible d\'envoyer l\'email. Veuillez réessayer plus tard.',
+                details: process.env.NODE_ENV === 'development' ? error.details : undefined
+            });
+        }
+        
+        res.status(500).json({ 
+            error: 'Erreur serveur',
+            message: 'Une erreur est survenue lors de l\'envoi.',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 
