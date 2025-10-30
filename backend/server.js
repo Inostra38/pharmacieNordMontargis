@@ -19,6 +19,11 @@ const {
   getCsrfToken 
 } = require('./middleware/csrf-protection');
 
+// ============================================
+// 🔄 IMPORT CACHE SCHEDULER
+// ============================================
+const cacheScheduler = require('./cache/cache-scheduler');
+
 const app = express();
 const PORT = config.port;
 
@@ -153,7 +158,6 @@ const strictApiLimiter = rateLimit({
   }
 });
 
-// APRÈS
 const moderateApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,  // 15 minutes
   max: 200,  // ✅ Augmenté pour supporter 19 batches + marge
@@ -173,6 +177,13 @@ const moderateApiLimiter = rateLimit({
 app.get('/api/csrf-token', csrfProtection, getCsrfToken);
 
 // ============================================
+// 📊 ROUTES PUBLIQUES (Monitoring et diagnostic)
+// ============================================
+
+const cacheRoutes = require('./routes/cache');
+app.use('/api/cache', cacheRoutes);
+
+// ============================================
 // 🔒 ROUTES API PROTÉGÉES (protectRoute = origin + csrf)
 // ============================================
 
@@ -190,7 +201,7 @@ app.use('/api/products', (req, res, next) => {
 });
 
 const productsRoutes = require('./routes/products');
-app.use('/api/products', moderateApiLimiter, protectRoute, productsRoutes);  // ← Cette ligne
+app.use('/api/products', moderateApiLimiter, protectRoute, productsRoutes);
 
 // ============================================
 // SERVEUR FICHIERS FRONTEND
@@ -210,7 +221,7 @@ app.get('*', (req, res, next) => {
 // ============================================
 // GESTION D'ERREURS
 // ============================================
-
+no
 // Gestionnaire CSRF (doit être AVANT le gestionnaire général)
 app.use(handleCsrfError);
 
@@ -253,4 +264,9 @@ app.listen(PORT, () => {
   console.log(`🛡️ Helmet + CORS + Rate Limiting + CSRF activés`);
   console.log(`🔒 Mode : ${process.env.NODE_ENV || 'development'}`);
   console.log('═══════════════════════════════════════════════════');
+  
+  // ============================================
+  // 🔄 DÉMARRAGE DU CACHE SCHEDULER
+  // ============================================
+  cacheScheduler.start();
 });

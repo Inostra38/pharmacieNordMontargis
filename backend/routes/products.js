@@ -143,20 +143,63 @@ router.get('/', async (req, res) => {
 
 // ============================================
 // 📍 ROUTE : GET /api/products/home
-// Produits optimisés pour la page d'accueil
-// (PAS de cache - toujours fresh)
+// Produits optimisés pour la page d'accueil DEPUIS LE CACHE LOCAL
 // ============================================
 
 router.get('/home', async (req, res) => {
     console.log('[INFO] 🏠 Requête de produits pour la page d\'accueil...');
 
     try {
-        // Pas de cache pour la page d'accueil
-        const data = await fetchFromGoogleAppsScript({ home: 1 });
+        // ✅ NOUVEAU : Extraire les produits home depuis le cache local
+        const cachedData = await fileCache.get();
+        
+        if (!cachedData || !cachedData.items) {
+            console.warn('⚠️ Pas de cache disponible pour extraire les produits home');
+            return res.json({
+                success: true,
+                data: {
+                    items: [],
+                    updatedAt: new Date().toISOString(),
+                    stockUpdatedAt: new Date().toISOString()
+                }
+            });
+        }
+
+        // ✅ LOGIQUE HOME : Produits en stock avec promotion ou "Petits Prix"
+        const MAX_HOME = 15;
+        const homeItems = [];
+        
+        for (const product of cachedData.items) {
+            if (homeItems.length >= MAX_HOME) break;
+            
+            // Doit être en stock
+            if (!product.stock || product.stock <= 0) continue;
+            
+            // Vérifier si c'est "Petits Prix"
+            const promoLabel = (product.promo_libelle || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const hasPetitsPrix = promoLabel.includes('petits prix');
+            
+            // Vérifier si c'est une promo (prix promo, lot ou libellé promo)
+            const hasPromoPrice = typeof product.prix_promo === 'number' && Number.isFinite(product.prix_promo);
+            const hasLot = typeof product.lot_size === 'number' && product.lot_size > 1;
+            const hasPromoLabel = product.promo_libelle && product.promo_libelle.trim() !== '';
+            const hasPromo = (hasPromoPrice || hasLot || hasPromoLabel) && !hasPetitsPrix;
+            
+            // Garder seulement les produits avec Petits Prix OU Promo
+            if (!hasPetitsPrix && !hasPromo) continue;
+            
+            homeItems.push(product);
+        }
+
+        console.log(`✅ ${homeItems.length} produits home extraits du cache (${cachedData.items.length} produits total)`);
 
         res.json({
             success: true,
-            data: data
+            data: {
+                items: homeItems,
+                updatedAt: cachedData.updatedAt || new Date().toISOString(),
+                stockUpdatedAt: cachedData.stockUpdatedAt || new Date().toISOString()
+            }
         });
 
     } catch (error) {
@@ -172,19 +215,58 @@ router.get('/home', async (req, res) => {
 
 // ============================================
 // 📍 ROUTE : GET /api/products/brands
-// Récupère la liste des marques
-// (PAS de cache - toujours fresh)
+// Récupère la liste des marques DEPUIS LE CACHE LOCAL
 // ============================================
 
 router.get('/brands', async (req, res) => {
     console.log('[INFO] 🏷️ Requête de récupération des marques...');
 
     try {
-        const data = await fetchFromGoogleAppsScript({ brands: 1 });
+        // ✅ NOUVEAU : Extraire les marques depuis le cache local
+        const cachedData = await fileCache.get();
+        
+        if (!cachedData || !cachedData.items) {
+            console.warn('⚠️ Pas de cache disponible pour extraire les marques');
+            return res.json({
+                success: true,
+                data: []
+            });
+        }
+
+        // Construire la map des marques avec compteur
+        const brandsMap = new Map();
+        
+        cachedData.items.forEach(product => {
+            const marque = product.marque || product.fabricant || '';
+            if (!marque.trim()) return;
+            
+            const normalized = marque.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            
+            if (brandsMap.has(normalized)) {
+                const existing = brandsMap.get(normalized);
+                existing.count++;
+                // Garder la version la plus longue du nom (avec majuscules, accents, etc.)
+                if (marque.length > existing.label.length) {
+                    existing.label = marque;
+                }
+            } else {
+                brandsMap.set(normalized, {
+                    label: marque,
+                    norm: normalized,
+                    count: 1
+                });
+            }
+        });
+
+        // Convertir en tableau et trier alphabétiquement
+        const brands = Array.from(brandsMap.values())
+            .sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+
+        console.log(`✅ ${brands.length} marques extraites du cache (${cachedData.items.length} produits)`);
 
         res.json({
             success: true,
-            data: data.brands || []
+            data: brands
         });
 
     } catch (error) {
