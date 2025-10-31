@@ -1,6 +1,6 @@
 // ==========================================
 // MIDDLEWARE CSRF - PROTECTION ULTRA-SÉCURISÉE
-// Avec liste blanche pour routes non-sensibles
+// Version 2.0 - Whitelist restrictive avec match exact
 // ==========================================
 
 const csrf = require('csurf');
@@ -25,42 +25,69 @@ const csrfProtection = csrf({
 });
 
 /**
- * ✅ NOUVEAU : Liste blanche des routes qui ne nécessitent pas de protection CSRF
- * Ces routes sont en lecture seule et non-sensibles
+ * 🔒 CSRF WHITELIST - Routes publiques en LECTURE SEULE
  * 
- * IMPORTANT : Les chemins sont RELATIFS au router monté
- * Exemple : Si monté sur /api/products, alors /cache-info = /api/products/cache-info
+ * Principe de sécurité :
+ * - ✅ Routes GET lecture seule → Pas de CSRF nécessaire
+ * - ❌ Routes POST/PUT/DELETE → CSRF obligatoire
+ * - ❌ Routes admin → CSRF obligatoire (même GET)
+ * 
+ * ⚠️ MATCH EXACT UNIQUEMENT (pas de startsWith/regex)
+ * 
+ * Format : Chemins absolus uniquement (ex: /api/products)
  */
 const CSRF_WHITELIST = [
-  '/cache-info',       // Route: /api/products/cache-info (lecture seule)
-  '/api/csrf-token'    // Route: /api/csrf-token (génération token)
+  // ============================================
+  // 🔓 ROUTE GÉNÉRATION TOKEN (OBLIGATOIRE)
+  // ============================================
+  '/api/csrf-token',              // GET - génération du token CSRF
+  
+  // ============================================
+  // 📊 ROUTES MONITORING (lecture seule, publiques)
+  // ============================================
+  '/api/cache/status',            // GET - statut du cache (diagnostic public)
+  
+  // ============================================
+  // 🛒 ROUTES PRODUITS (lecture seule, publiques)
+  // ============================================
+  '/api/products',                // GET - liste tous les produits (catalogue public)
+  '/api/products/brands',         // GET - liste des marques (catalogue public)
+  '/api/products/home',           // GET - produits page d'accueil (catalogue public)
+  '/api/products/cache-info',     // GET - info cache produits (diagnostic)
+  
+  // ============================================
+  // ❌ ROUTES EXCLUES (nécessitent CSRF) - Pour référence
+  // ============================================
+  // POST /api/products/refresh-cache  → Rafraîchissement cache (admin)
+  // POST /api/prescription            → Envoi ordonnance (sensible)
+  // POST /api/cart                    → Envoi panier (sensible)
+  // POST /api/cart/submit             → Validation panier (sensible)
 ];
 
 /**
- * Vérifier si une route est dans la liste blanche
+ * Vérifier si une route est whitelistée
+ * ✅ NOUVEAU : Match EXACT uniquement (sécurité maximale)
+ * 
+ * @param {string} path - Chemin de la requête (ex: /api/products)
+ * @returns {boolean} - true si whitelistée, false sinon
  */
 function isWhitelisted(path) {
-  console.log('🔍 DEBUG isWhitelisted - path reçu:', path);
-  console.log('🔍 DEBUG isWhitelisted - CSRF_WHITELIST:', CSRF_WHITELIST);
-  
-  const result = CSRF_WHITELIST.some(whitelisted => {
-    const match = path === whitelisted || path.startsWith(whitelisted);
-    console.log(`🔍 Comparaison: "${path}" vs "${whitelisted}" = ${match}`);
-    return match;
-  });
-  
-  console.log('🔍 DEBUG isWhitelisted - résultat final:', result);
-  return result;
+  // ✅ Match exact uniquement (pas de startsWith/includes/regex)
+  return CSRF_WHITELIST.includes(path);
 }
 
 /**
  * Middleware de vérification d'origine
  * Vérifie que la requête vient bien d'un domaine autorisé
+ * 
+ * @param {Request} req - Requête Express
+ * @param {Response} res - Réponse Express
+ * @param {Function} next - Callback next
  */
 function verifyOrigin(req, res, next) {
-  // ✅ IMPORTANT : Vérifier la whitelist EN PREMIER (avant origin)
+  // ✅ Vérifier la whitelist EN PREMIER (avant origin check)
   if (isWhitelisted(req.path)) {
-    console.log('✅ Route whitelistée, accès autorisé sans origin:', req.path);
+    // Route publique, pas de vérification d'origine nécessaire
     return next();
   }
   
@@ -74,13 +101,8 @@ function verifyOrigin(req, res, next) {
     'https://www.pharmacienordmontargis.fr'
   ];
   
-  // Bloquer si pas d'origine (sauf pour /api/csrf-token)
+  // Bloquer si pas d'origine
   if (!origin) {
-    // Autoriser seulement pour la route de génération du token CSRF
-    if (req.path === '/api/csrf-token') {
-      return next();
-    }
-    
     console.error('🚨 CSRF - Requête sans origine bloquée:', {
       ip: req.ip,
       path: req.path,
@@ -94,7 +116,7 @@ function verifyOrigin(req, res, next) {
     });
   }
   
-  // Vérifier l'origine
+  // Vérifier que l'origine est autorisée
   const isAllowed = allowedOrigins.some(allowed => 
     origin.startsWith(allowed)
   );
@@ -117,15 +139,38 @@ function verifyOrigin(req, res, next) {
 }
 
 /**
+ * Middleware CSRF conditionnel
+ * Applique la protection CSRF sauf pour les routes whitelistées
+ * 
+ * @param {Request} req - Requête Express
+ * @param {Response} res - Réponse Express
+ * @param {Function} next - Callback next
+ */
+function conditionalCsrfProtection(req, res, next) {
+  if (isWhitelisted(req.path)) {
+    // Route whitelistée, pas de protection CSRF
+    return next();
+  }
+  
+  // Appliquer la protection CSRF normale
+  csrfProtection(req, res, next);
+}
+
+/**
  * Middleware de gestion des erreurs CSRF
  * Fournit des messages d'erreur détaillés et log les tentatives
+ * 
+ * @param {Error} err - Erreur
+ * @param {Request} req - Requête Express
+ * @param {Response} res - Réponse Express
+ * @param {Function} next - Callback next
  */
 function handleCsrfError(err, req, res, next) {
   if (err.code !== 'EBADCSRFTOKEN') {
     return next(err);
   }
   
-  // Logger la tentative CSRF
+  // Logger la tentative CSRF suspecte
   console.error('🚨 TENTATIVE CSRF DÉTECTÉE:', {
     ip: req.ip,
     path: req.path,
@@ -138,7 +183,7 @@ function handleCsrfError(err, req, res, next) {
     hasCookie: !!req.cookies._csrf
   });
   
-  // Réponse au client
+  // Réponse sécurisée au client
   res.status(403).json({
     error: 'Token CSRF invalide',
     message: 'Votre session a expiré ou le token est invalide. Veuillez rafraîchir la page.',
@@ -148,22 +193,12 @@ function handleCsrfError(err, req, res, next) {
 }
 
 /**
- * ✅ NOUVEAU : Middleware CSRF conditionnel
- * Applique la protection CSRF sauf pour les routes whitelistées
- */
-function conditionalCsrfProtection(req, res, next) {
-  if (isWhitelisted(req.path)) {
-    console.log('✅ Route whitelistée, pas de protection CSRF:', req.path);
-    return next();
-  }
-  
-  // Appliquer la protection CSRF normale
-  csrfProtection(req, res, next);
-}
-
-/**
  * Middleware combiné : Origin + CSRF conditionnel
- * À utiliser sur toutes les routes sensibles (sauf /api/csrf-token)
+ * À utiliser sur toutes les routes API (sauf statiques)
+ * 
+ * @param {Request} req - Requête Express
+ * @param {Response} res - Réponse Express
+ * @param {Function} next - Callback next
  */
 function protectRoute(req, res, next) {
   // Étape 1 : Vérifier l'origine (avec whitelist)
@@ -176,8 +211,11 @@ function protectRoute(req, res, next) {
 }
 
 /**
- * Route pour obtenir un nouveau token CSRF
+ * Handler pour la route de génération de token CSRF
  * Cette fonction doit être utilisée AVEC csrfProtection appliqué avant
+ * 
+ * @param {Request} req - Requête Express
+ * @param {Response} res - Réponse Express
  */
 function getCsrfToken(req, res) {
   try {
@@ -200,11 +238,11 @@ function getCsrfToken(req, res) {
 // ==========================================
 
 module.exports = {
-  csrfProtection,           // Protection CSRF seule
-  verifyOrigin,             // Vérification origine seule
-  protectRoute,             // Protection combinée avec whitelist (recommandé)
-  conditionalCsrfProtection, // Protection CSRF avec whitelist
-  handleCsrfError,          // Gestionnaire d'erreurs
+  csrfProtection,           // Protection CSRF seule (pour route /api/csrf-token)
+  verifyOrigin,             // Vérification origine seule (si besoin spécifique)
+  protectRoute,             // ✅ RECOMMANDÉ : Protection combinée avec whitelist
+  conditionalCsrfProtection, // Protection CSRF avec whitelist (si besoin spécifique)
+  handleCsrfError,          // Gestionnaire d'erreurs CSRF (middleware global)
   getCsrfToken,             // Handler pour route /api/csrf-token
-  isWhitelisted             // Utilitaire pour vérifier whitelist
+  isWhitelisted             // Utilitaire pour vérifier whitelist (si besoin dans tests)
 };

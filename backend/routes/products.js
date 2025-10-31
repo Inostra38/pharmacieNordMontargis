@@ -12,7 +12,13 @@ if (!process.env.GOOGLE_APPS_SCRIPT_URL) {
 }
 
 // ============================================
-// 🔄 FONCTION DE RÉCUPÉRATION DEPUIS GOOGLE APPS SCRIPT
+// ⚙️ CONFIGURATION
+// ============================================
+
+const REQUEST_TIMEOUT = 60000; // 60 secondes
+
+// ============================================
+// 🔄 FONCTION DE RÉCUPÉRATION DEPUIS GOOGLE APPS SCRIPT (avec timeout)
 // ============================================
 
 async function fetchFromGoogleAppsScript(params = {}) {
@@ -31,30 +37,110 @@ async function fetchFromGoogleAppsScript(params = {}) {
     console.log('📡 Requête vers Google Apps Script...');
     const startTime = Date.now();
 
-    const response = await fetch(url.toString(), {
-        method: 'GET',
-        redirect: 'follow',
-        headers: {
-            'User-Agent': 'Pharmacie-Nord-Backend/1.0'
+    // ✅ NOUVEAU : Créer un AbortController pour le timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    try {
+        const response = await fetch(url.toString(), {
+            method: 'GET',
+            redirect: 'follow',
+            headers: {
+                'User-Agent': 'Pharmacie-Nord-Backend/1.0'
+            },
+            signal: controller.signal // ✅ Ajout du signal pour timeout
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            throw new Error(`Erreur Google Apps Script: ${response.status}`);
         }
-    });
 
-    if (!response.ok) {
-        throw new Error(`Erreur Google Apps Script: ${response.status}`);
+        const data = await response.json();
+        const loadTime = Date.now() - startTime;
+
+        console.log(`✅ Données reçues en ${loadTime}ms`);
+        console.log(`📦 ${data.items?.length || 0} produits`);
+
+        return data;
+
+    } catch (error) {
+        clearTimeout(timeoutId);
+        
+        // ✅ NOUVEAU : Gestion spécifique du timeout
+        if (error.name === 'AbortError') {
+            throw new Error(`Timeout après ${REQUEST_TIMEOUT / 1000}s`);
+        }
+        
+        throw error;
     }
+}
 
-    const data = await response.json();
-    const loadTime = Date.now() - startTime;
+// ============================================
+// 🛡️ FONCTION CENTRALISÉE : FALLBACK AUTOMATIQUE
+// Assure que le cache est toujours chargé
+// ============================================
 
-    console.log(`✅ Données reçues en ${loadTime}ms`);
-    console.log(`📦 ${data.items?.length || 0} produits`);
-
-    return data;
+/**
+ * 🔄 FALLBACK AUTOMATIQUE : Assure que le cache serveur est chargé
+ * 
+ * Logique :
+ * 1. Vérifie si le cache serveur est valide
+ * 2. Si OUI → retourne les données du cache
+ * 3. Si NON (expiré/vide) → FALLBACK :
+ *    - Récupère depuis Google Apps Script
+ *    - Met à jour le cache serveur
+ *    - Retourne les données fraîches
+ * 
+ * @returns {Object} Les données des produits (depuis cache ou Apps Script)
+ * @throws {Error} Si impossible de récupérer les données
+ */
+async function ensureCacheLoaded() {
+    // 1. Vérifier le cache serveur
+    let cachedData = await fileCache.get();
+    
+    if (cachedData) {
+        console.log('✅ Cache serveur valide trouvé');
+        const cacheInfo = await fileCache.getInfo();
+        console.log(`📊 Cache: ${cachedData.items?.length || 0} produits (âge: ${cacheInfo.ageMinutes}min)`);
+        return cachedData;
+    }
+    
+    // 2. FALLBACK : Cache expiré ou vide
+    console.log('⚠️ Cache serveur expiré ou vide - ACTIVATION FALLBACK');
+    console.log('🔄 Récupération depuis Google Apps Script...');
+    
+    try {
+        // Récupérer TOUS les produits
+        // ✅ CORRECTION : Ajout du paramètre backend=1
+        const data = await fetchFromGoogleAppsScript({ 
+            backend: '1',    // ✅ Paramètre spécial pour récupérer TOUS les produits
+            limit: 50000, 
+            offset: 0 
+        });
+        
+        // Valider les données
+        if (!data || !data.items || !Array.isArray(data.items)) {
+            throw new Error('Format de données invalide reçu de Google Apps Script');
+        }
+        
+        // 3. Mettre à jour le cache serveur
+        console.log('💾 Mise à jour du cache serveur...');
+        await fileCache.set(data);
+        console.log(`✅ Cache serveur rechargé avec succès (${data.items.length} produits)`);
+        
+        return data;
+        
+    } catch (error) {
+        console.error('❌ ERREUR FALLBACK:', error.message);
+        throw new Error(`Impossible de charger les produits: ${error.message}`);
+    }
 }
 
 // ============================================
 // 📍 ROUTE : GET /api/products
-// Récupère tous les produits (avec cache fichier 2h + pagination)
+// Récupère tous les produits (avec cache fichier + pagination)
 // ============================================
 
 router.get('/', async (req, res) => {
@@ -67,57 +153,16 @@ router.get('/', async (req, res) => {
         
         console.log(`📊 Pagination demandée: limit=${limit}, offset=${offset}`);
         
-        // 1. Vérifier le cache fichier d'abord
-        const cachedData = await fileCache.get();
+        // ✅ NOUVEAU : Utilisation du fallback automatique
+        const data = await ensureCacheLoaded();
+        const cacheInfo = await fileCache.getInfo();
         
-        if (cachedData) {
-            console.log('✅ Cache valide trouvé');
-            const cacheInfo = await fileCache.getInfo();
-            
-            // ✅ IMPORTANT : Appliquer limit et offset sur les données du cache
-            const allItems = cachedData.items || [];
-            const paginatedItems = allItems.slice(offset, offset + limit);
-            
-            console.log(`📦 Cache: ${allItems.length} produits total, retour de ${paginatedItems.length} produits (offset: ${offset})`);
-            
-            return res.json({
-                success: true,
-                data: {
-                    items: paginatedItems,
-                    total: allItems.length,
-                    updatedAt: cachedData.updatedAt,
-                    stockUpdatedAt: cachedData.stockUpdatedAt,
-                    cached: true
-                },
-                cached: true,
-                cacheAge: cacheInfo.ageMinutes,
-                expiresIn: cacheInfo.remainingMinutes
-            });
-        }
-
-        // 2. Si pas de cache, récupérer depuis Google Apps Script
-        console.log('🔄 Pas de cache valide, récupération depuis Apps Script...');
-        
-        // ⚠️ Charger TOUS les produits pour remplir le cache
-        const params = {
-            limit: 50000,  // Charger tout pour le cache
-            offset: 0
-        };
-
-        if (req.query.q) params.q = req.query.q;
-        if (req.query.featured) params.featured = req.query.featured;
-
-        const data = await fetchFromGoogleAppsScript(params);
-
-        // 3. Mettre en cache fichier (2h)
-        await fileCache.set(data);
-        
-        // 4. Appliquer la pagination sur les données fraîches
+        // Appliquer la pagination sur les données
         const allItems = data.items || [];
         const paginatedItems = allItems.slice(offset, offset + limit);
         
-        console.log(`📦 Apps Script: ${allItems.length} produits total, retour de ${paginatedItems.length} produits (offset: ${offset})`);
-
+        console.log(`📦 Retour de ${paginatedItems.length} produits (offset: ${offset}, total: ${allItems.length})`);
+        
         res.json({
             success: true,
             data: {
@@ -125,85 +170,15 @@ router.get('/', async (req, res) => {
                 total: allItems.length,
                 updatedAt: data.updatedAt,
                 stockUpdatedAt: data.stockUpdatedAt,
-                cached: false
+                cached: true
             },
-            cached: false
+            cached: true,
+            cacheAge: cacheInfo.ageMinutes,
+            expiresIn: cacheInfo.remainingMinutes
         });
 
     } catch (error) {
         console.error('[ERREUR] ❌ Erreur lors de la récupération des produits:', error);
-        
-        res.status(500).json({
-            success: false,
-            error: 'Erreur serveur',
-            message: 'Impossible de récupérer les produits. Veuillez réessayer plus tard.'
-        });
-    }
-});
-
-// ============================================
-// 📍 ROUTE : GET /api/products/home
-// Produits optimisés pour la page d'accueil DEPUIS LE CACHE LOCAL
-// ============================================
-
-router.get('/home', async (req, res) => {
-    console.log('[INFO] 🏠 Requête de produits pour la page d\'accueil...');
-
-    try {
-        // ✅ NOUVEAU : Extraire les produits home depuis le cache local
-        const cachedData = await fileCache.get();
-        
-        if (!cachedData || !cachedData.items) {
-            console.warn('⚠️ Pas de cache disponible pour extraire les produits home');
-            return res.json({
-                success: true,
-                data: {
-                    items: [],
-                    updatedAt: new Date().toISOString(),
-                    stockUpdatedAt: new Date().toISOString()
-                }
-            });
-        }
-
-        // ✅ LOGIQUE HOME : Produits en stock avec promotion ou "Petits Prix"
-        const MAX_HOME = 15;
-        const homeItems = [];
-        
-        for (const product of cachedData.items) {
-            if (homeItems.length >= MAX_HOME) break;
-            
-            // Doit être en stock
-            if (!product.stock || product.stock <= 0) continue;
-            
-            // Vérifier si c'est "Petits Prix"
-            const promoLabel = (product.promo_libelle || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            const hasPetitsPrix = promoLabel.includes('petits prix');
-            
-            // Vérifier si c'est une promo (prix promo, lot ou libellé promo)
-            const hasPromoPrice = typeof product.prix_promo === 'number' && Number.isFinite(product.prix_promo);
-            const hasLot = typeof product.lot_size === 'number' && product.lot_size > 1;
-            const hasPromoLabel = product.promo_libelle && product.promo_libelle.trim() !== '';
-            const hasPromo = (hasPromoPrice || hasLot || hasPromoLabel) && !hasPetitsPrix;
-            
-            // Garder seulement les produits avec Petits Prix OU Promo
-            if (!hasPetitsPrix && !hasPromo) continue;
-            
-            homeItems.push(product);
-        }
-
-        console.log(`✅ ${homeItems.length} produits home extraits du cache (${cachedData.items.length} produits total)`);
-
-        res.json({
-            success: true,
-            data: {
-                items: homeItems,
-                updatedAt: cachedData.updatedAt || new Date().toISOString(),
-                stockUpdatedAt: cachedData.stockUpdatedAt || new Date().toISOString()
-            }
-        });
-
-    } catch (error) {
-        console.error('[ERREUR] ❌ Erreur lors de la récupération des produits home:', error);
         
         res.status(500).json({
             success: false,
@@ -222,11 +197,10 @@ router.get('/brands', async (req, res) => {
     console.log('[INFO] 🏷️ Requête de récupération des marques...');
 
     try {
-        // ✅ NOUVEAU : Extraire les marques depuis le cache local
-        const cachedData = await fileCache.get();
+        // ✅ NOUVEAU : Utilisation du fallback automatique
+        const data = await ensureCacheLoaded();
         
-        if (!cachedData || !cachedData.items) {
-            console.warn('⚠️ Pas de cache disponible pour extraire les marques');
+        if (!data || !data.items) {
             return res.json({
                 success: true,
                 data: []
@@ -236,7 +210,7 @@ router.get('/brands', async (req, res) => {
         // Construire la map des marques avec compteur
         const brandsMap = new Map();
         
-        cachedData.items.forEach(product => {
+        data.items.forEach(product => {
             const marque = product.marque || product.fabricant || '';
             if (!marque.trim()) return;
             
@@ -262,7 +236,7 @@ router.get('/brands', async (req, res) => {
         const brands = Array.from(brandsMap.values())
             .sort((a, b) => a.label.localeCompare(b.label, 'fr'));
 
-        console.log(`✅ ${brands.length} marques extraites du cache (${cachedData.items.length} produits)`);
+        console.log(`✅ ${brands.length} marques extraites (${data.items.length} produits)`);
 
         res.json({
             success: true,
@@ -275,7 +249,78 @@ router.get('/brands', async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Erreur serveur',
-            message: 'Impossible de récupérer les marques.'
+            message: 'Impossible de récupérer les marques. Veuillez réessayer plus tard.'
+        });
+    }
+});
+
+// ============================================
+// 📍 ROUTE : GET /api/products/home
+// Produits optimisés pour la page d'accueil DEPUIS LE CACHE LOCAL
+// ============================================
+
+router.get('/home', async (req, res) => {
+    console.log('[INFO] 🏠 Requête de produits pour la page d\'accueil...');
+
+    try {
+        // ✅ NOUVEAU : Utilisation du fallback automatique
+        const data = await ensureCacheLoaded();
+        
+        if (!data || !data.items) {
+            return res.json({
+                success: true,
+                data: {
+                    items: [],
+                    updatedAt: new Date().toISOString(),
+                    stockUpdatedAt: new Date().toISOString()
+                }
+            });
+        }
+
+        // ✅ LOGIQUE HOME : Produits en stock avec promotion ou "Petits Prix"
+        const MAX_HOME = 15;
+        const homeItems = [];
+        
+        for (const product of data.items) {
+            if (homeItems.length >= MAX_HOME) break;
+            
+            // Doit être en stock
+            if (!product.stock || product.stock <= 0) continue;
+            
+            // Vérifier si c'est "Petits Prix"
+            const promoLabel = (product.promo_libelle || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const hasPetitsPrix = promoLabel.includes('petits prix');
+            
+            // Vérifier si c'est une promo (prix promo, lot ou libellé promo)
+            const hasPromoPrice = typeof product.prix_promo === 'number' && Number.isFinite(product.prix_promo);
+            const hasLot = typeof product.lot_size === 'number' && product.lot_size > 1;
+            const hasPromoLabel = product.promo_libelle && product.promo_libelle.trim() !== '';
+            const hasPromo = (hasPromoPrice || hasLot || hasPromoLabel) && !hasPetitsPrix;
+            
+            // Garder seulement les produits avec Petits Prix OU Promo
+            if (!hasPetitsPrix && !hasPromo) continue;
+            
+            homeItems.push(product);
+        }
+
+        console.log(`✅ ${homeItems.length} produits home extraits (${data.items.length} produits total)`);
+
+        res.json({
+            success: true,
+            data: {
+                items: homeItems,
+                updatedAt: data.updatedAt || new Date().toISOString(),
+                stockUpdatedAt: data.stockUpdatedAt || new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        console.error('[ERREUR] ❌ Erreur lors de la récupération des produits home:', error);
+        
+        res.status(500).json({
+            success: false,
+            error: 'Erreur serveur',
+            message: 'Impossible de récupérer les produits. Veuillez réessayer plus tard.'
         });
     }
 });
@@ -320,7 +365,12 @@ router.post('/refresh-cache', async (req, res) => {
         await fileCache.clear();
         
         // 2. Récupérer les nouvelles données (TOUS les produits)
-        const data = await fetchFromGoogleAppsScript({ limit: 50000, offset: 0 });
+        // ✅ CORRECTION : Ajout du paramètre backend=1
+        const data = await fetchFromGoogleAppsScript({ 
+            backend: '1',    // ✅ Paramètre spécial pour récupérer TOUS les produits
+            limit: 50000, 
+            offset: 0 
+        });
         
         // 3. Sauvegarder dans le cache
         await fileCache.set(data);
