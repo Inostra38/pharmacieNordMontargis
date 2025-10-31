@@ -1,0 +1,11 @@
+/* Fichier source Tailwind CSS */
+/* Ce fichier sera compilé en tailwind.min.css */
+
+/* Styles de base (reset CSS + styles HTML de base) */
+@tailwind base;
+
+/* Composants Tailwind (réutilisables) */
+@tailwind components;
+
+/* Classes utilitaires (bg-blue-500, text-center, etc.) */
+@tailwind utilities;

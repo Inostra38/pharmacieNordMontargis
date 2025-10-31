@@ -36,20 +36,20 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: [
-        "'self'", 
-        "'unsafe-inline'",
-        "'unsafe-hashes'",
-        "https://cdn.tailwindcss.com",
+        "'self'",
+        // ✅ Supprimé: "'unsafe-inline'" - plus besoin avec Tailwind local
+        "'unsafe-hashes'",  // Gardé pour scripts inline légitimes (analytics)
+        // ✅ Supprimé: "https://cdn.tailwindcss.com" - maintenant local
         "https://www.googletagmanager.com",
         "https://www.google-analytics.com",
-        "https://cdn.jsdelivr.net"
+        "https://cdn.jsdelivr.net"  // Pour CookieConsent
       ],
       styleSrc: [
-        "'self'", 
-        "'unsafe-inline'",
-        "https://fonts.googleapis.com",
-        "https://cdn.tailwindcss.com",
-        "https://cdn.jsdelivr.net"
+        "'self'",
+        // ✅ Supprimé: "'unsafe-inline'" - plus besoin avec Tailwind local
+        "https://fonts.googleapis.com",  // Google Fonts
+        // ✅ Supprimé: "https://cdn.tailwindcss.com" - maintenant local
+        "https://cdn.jsdelivr.net"  // Pour CookieConsent CSS
       ],
       fontSrc: [
         "'self'",
