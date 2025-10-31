@@ -268,34 +268,10 @@
     <script src="assets/js/config.js"></script>
     <script src="assets/js/cart-v2.js"></script>
     <script src="assets/js/script.js" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.umd.js"></script>
     <script src="assets/js/cookie-config.js"></script>
     <script src="assets/js/csrf-manager.js"></script>
     <script src="assets/js/upload.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const cartBtn = document.getElementById('cartButton');
-            const cartDrawer = document.getElementById('cartDrawer');
-            const cartOverlay = document.getElementById('cartOverlay');
-            const closeCart = document.getElementById('closeCart');
-
-            if (cartBtn && cartDrawer && cartOverlay && closeCart) {
-                cartBtn.addEventListener('click', () => {
-                    cartDrawer.classList.remove('-translate-x-full');
-                    cartOverlay.classList.remove('hidden');
-                    if (window.cartManager) window.cartManager.render();
-                });
-                closeCart.addEventListener('click', () => {
-                    cartDrawer.classList.add('-translate-x-full');
-                    cartOverlay.classList.add('hidden');
-                });
-                cartOverlay.addEventListener('click', () => {
-                    cartDrawer.classList.add('-translate-x-full');
-                    cartOverlay.classList.add('hidden');
-                });
-            }
-        });
-    </script>
 </body>
 
 </html>

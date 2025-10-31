@@ -287,43 +287,6 @@ function setupSmoothScroll() {
     });
 }
 
-
-// ==========================================
-// 8. AJOUT DES STYLES CSS PERSONNALISÉS
-// ==========================================
-// (Le code existant pour ajouter les styles reste ici)
-function injectCustomStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        /* Transitions douces pour le dark mode */
-        .transition-colors-slow { transition: background-color 0.3s ease, color 0.3s ease; }
-
-        /* Animation d'apparition au scroll */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { opacity: 0; animation: fadeIn 0.6s ease-out forwards; } /* Démarre invisible */
-
-        /* Animation pour le badge pulsant */
-        @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .animate-pulse-badge { animation: pulse-badge 2s ease-in-out infinite; }
-
-        /* Effet hover lift */
-        .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .hover-lift:hover { transform: translateY(-4px); }
-
-        /* Style pour les notifications */
-        #notification { /* Styles gérés via JS maintenant */ }
-
-        /* Scroll offset pour les ancres (peut être moins nécessaire avec le JS) */
-        .scroll-offset { scroll-margin-top: 100px; }
-
-        /* Limitation de lignes */
-        .line-clamp-1, .line-clamp-2 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
-        .line-clamp-1 { -webkit-line-clamp: 1; }
-        .line-clamp-2 { -webkit-line-clamp: 2; }
-    `;
-    document.head.appendChild(style);
-}
-
 // ==========================================
 // NOUVEAU: Générer et Télécharger vCard (.vcf)
 // ==========================================
@@ -381,9 +344,7 @@ function downloadVCard() {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Injecter les styles CSS perso
-    injectCustomStyles();
-
+   
     // Mettre à jour le statut ouvert/fermé
     updateOpenStatus();
     setInterval(updateOpenStatus, 60000); // Répéter chaque minute
