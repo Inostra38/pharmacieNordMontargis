@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailInput = document.getElementById('email');
     const confirmationCheckbox = document.getElementById('sendConfirmation');
 
-    const API_ENDPOINT = 'http://localhost:3000/api/cart/send-reservation';
+    const API_ENDPOINT = '/api/cart/send-reservation';
 
     let cartItems = [];
     let cartTotal = 0;

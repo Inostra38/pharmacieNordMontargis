@@ -68,6 +68,7 @@ app.use(helmet({
       ],
       connectSrc: [
         "'self'",
+        "http://localhost:3000",
         "https://www.google-analytics.com",
         "https://region1.google-analytics.com",
         "https://script.google.com",
