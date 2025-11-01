@@ -1,7 +1,8 @@
 // ==========================================
 // File System Cache - Module de cache fichier
-// TTL: 2 heures (produits mis à jour 1x/jour)
+// TTL: 2 heures (produits mis à jour 1x/jour) 
 // ==========================================
+// 1
 
 const fs = require('fs').promises;
 const path = require('path');
