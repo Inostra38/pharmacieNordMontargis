@@ -96,7 +96,8 @@ const corsOptions = {
       'http://localhost:3000',
       'http://127.0.0.1:3000',
       'https://www.pharmacienordmontargis.fr',
-      'https://pharmacienordmontargis.fr'
+      'https://pharmacienordmontargis.fr',
+      'https://app-6bd989fc-e103-4280-a1a6-68025fb35dcf.cleverapps.io'
     ];
     
     if (!origin) return callback(null, true);

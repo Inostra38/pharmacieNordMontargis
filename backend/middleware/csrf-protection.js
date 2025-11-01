@@ -98,7 +98,8 @@ function verifyOrigin(req, res, next) {
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://pharmacienordmontargis.fr',
-    'https://www.pharmacienordmontargis.fr'
+    'https://www.pharmacienordmontargis.fr',
+    'https://app-6bd989fc-e103-4280-a1a6-68025fb35dcf.cleverapps.io'
   ];
   
   // Bloquer si pas d'origine
