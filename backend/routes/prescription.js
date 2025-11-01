@@ -56,7 +56,7 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     // Filtrage initial (sera vérifié à nouveau par le middleware)
-    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+    const allowedMimes = ['application/pdf'];
     
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);

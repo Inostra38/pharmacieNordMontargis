@@ -167,24 +167,48 @@ class HomeProductsManager {
      * 📢 Notification discrète de mise à jour
      */
     notifyUpdate() {
-        const notification = document.createElement('div');
-        notification.className = 'fixed bottom-4 right-4 bg-teal-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        notification.innerHTML = `
-            <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined">update</span>
-                <span>Nouvelles promos disponibles !</span>
-                <button onclick="location.reload()" class="ml-2 underline hover:no-underline">Actualiser</button>
-                <button onclick="this.parentElement.parentElement.remove()" class="ml-2">✕</button>
-            </div>
-        `;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                notification.remove();
-            }
-        }, 8000);
-    }
+    const notification = document.createElement('div');
+    notification.className = 'fixed bottom-4 right-4 bg-teal-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+
+    const container = document.createElement('div');
+    container.className = 'flex items-center gap-3';
+
+    // Contenu (icône et texte)
+    container.innerHTML = `
+        <span class="material-symbols-outlined">update</span>
+        <span>Nouvelles promos disponibles !</span>
+    `;
+
+    // Bouton "Actualiser"
+    const reloadBtn = document.createElement('button');
+    reloadBtn.className = 'ml-2 underline hover:no-underline';
+    reloadBtn.textContent = 'Actualiser';
+    reloadBtn.addEventListener('click', () => {
+        location.reload();
+    });
+
+    // Bouton "Fermer"
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'ml-2';
+    closeBtn.textContent = '✕';
+    closeBtn.setAttribute('aria-label', 'Fermer la notification');
+    closeBtn.addEventListener('click', () => {
+        notification.remove();
+    });
+
+    // Assemblage
+    container.appendChild(reloadBtn);
+    container.appendChild(closeBtn);
+    notification.appendChild(container);
+    document.body.appendChild(notification);
+
+    // Suppression automatique
+    setTimeout(() => {
+        if (document.body.contains(notification)) {
+            notification.remove();
+        }
+    }, 8000);
+}
 
     /**
      * 🔄 Forcer le rafraîchissement (bouton)

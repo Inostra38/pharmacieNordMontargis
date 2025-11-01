@@ -365,6 +365,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // C'est normal si on n'est pas sur index.html
         // console.warn('⚠️ Bouton #addToContactsBtn non trouvé sur cette page.');
     }
+//Fonction copier du bouton copier e-mail
+const copyBtn = document.getElementById('copyEmailBtn');
+if (copyBtn) {
+    copyBtn.addEventListener('click', copyEmail);
+    console.log('✅ Écouteur ajouté pour le bouton "Copier Email".');
+}
 
     // Log final
     console.log('✅ Script principal chargé et initialisé');

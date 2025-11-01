@@ -152,18 +152,14 @@ const validateFileUpload = (req, res, next) => {
   
   // Types MIME autorisés pour les ordonnances
   const allowedMimeTypes = [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/webp',
-    'application/pdf'
+     'application/pdf'
   ];
   
   // Vérifier le type MIME
   if (!allowedMimeTypes.includes(file.mimetype)) {
     return res.status(400).json({
       error: 'Type de fichier non autorisé',
-      message: 'Seuls les fichiers JPG, PNG, WEBP et PDF sont acceptés.',
+      message: 'Seuls les fichiers PDF sont acceptés.',
       received: file.mimetype
     });
   }
