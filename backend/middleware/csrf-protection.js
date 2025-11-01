@@ -3,7 +3,7 @@
 // Version 2.0 - Whitelist restrictive avec match exact
 // ==========================================
 
-const csrf = require('csurf');
+const { csrf } = require('csurf-csrf');
 
 /**
  * Configuration CSRF ultra-sécurisée
