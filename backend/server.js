@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const path = require('path');
+const compression = require('compression');
 
 // Validation environnement
 const { validateEnv, checkDefaultValues } = require('./config/env-validator');
@@ -27,9 +28,12 @@ const cacheScheduler = require('./cache/cache-scheduler');
 const app = express();
 const PORT = config.port;
 
+app.use(compression());
+
 // ============================================
 // 🛡️ CONFIGURATION SÉCURITÉ
 // ============================================
+
 
 app.use(helmet({
   contentSecurityPolicy: {
