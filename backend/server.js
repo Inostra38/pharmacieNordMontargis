@@ -29,6 +29,7 @@ const app = express();
 const PORT = config.port;
 
 app.use(compression());
+app.set('trust proxy', 1); // Indique à Express de faire confiance au reverse proxy (Clever Cloud)
 
 // ============================================
 // 🛡️ CONFIGURATION SÉCURITÉ
