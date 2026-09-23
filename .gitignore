@@ -42,3 +42,5 @@ Thumbs.db
 # Optional: Test coverage
 # coverage/
 # .nyc_output/
+# direnv (sélection compte Scalingo)
+.envrc
