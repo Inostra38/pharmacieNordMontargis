@@ -42,5 +42,6 @@ Thumbs.db
 # Optional: Test coverage
 # coverage/
 # .nyc_output/
-# direnv (sélection compte Scalingo)
+# direnv : config locale à la machine (le .envrc actuel ne sert qu'à
+# sélectionner un compte Scalingo ; la prod, elle, est sur Clever Cloud)
 .envrc
